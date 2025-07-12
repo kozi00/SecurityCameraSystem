@@ -61,7 +61,7 @@ void setup() {
 
   // Rozdzielczość i jakość
   config.frame_size = FRAMESIZE_QVGA; // FRAMESIZE_SVGA, UXGA, QVGA, ...
-  config.jpeg_quality = 10;           // 0-63 (niższa = lepsza jakość)
+  config.jpeg_quality = 4;           // 0-63 (niższa = lepsza jakość)
   config.fb_count = 2;
 
   // Inicjalizacja kamery
@@ -82,22 +82,22 @@ void setup() {
   Serial.println("Połączono z WiFi!");
   Serial.print("Adres IP: ");
   Serial.println(WiFi.localIP());
-
 }
 
 void loop() {
   camera_fb_t *fb = esp_camera_fb_get();
   if (!fb) return;
-
+  
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     http.begin(serverUrl);
     http.addHeader("Content-Type", "image/jpeg");
-    http.POST(fb->buf, fb->len);
+    int httpResponseCode = http.POST(fb->buf, fb->len);
     http.end();
+    
   }
 
   esp_camera_fb_return(fb);
-  delay(1000); // co 1s
+  delay(30); // 
 }
 

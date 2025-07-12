@@ -1,10 +1,35 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "ESP32 Stream";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>Podgląd z kamery ESP32</h1>
+<img id="liveStream" style="border:1px solid #000; width: 640px;" />
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/cameraHub")
+            .build();
+
+        connection.on("ReceiveFrame", function (base64Image) {
+            const byteCharacters = atob(base64Image);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+
+            const blob = new Blob([byteArray], { type: 'image/jpeg' });
+            const imageUrl = URL.createObjectURL(blob);
+
+            const img = document.getElementById("liveStream");
+            img.src = imageUrl;
+        });
+
+
+        connection.start().catch(err => console.error(err.toString()));
+    </script>
+}
