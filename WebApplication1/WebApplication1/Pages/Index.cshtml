@@ -4,8 +4,10 @@
     ViewData["Title"] = "ESP32 Stream";
 }
 
-<h1>Podgląd z kamery ESP32</h1>
-<img id="liveStream" style="border:1px solid #000; width: 640px;" />
+<h1>Podgląd z kamery 1</h1>
+<img id="camera_balkon" style="border:1px solid #000; width: 640px;" />
+<h1>Podgląd z kamery 2</h1>
+<img id="camera_drzwi" style="border:1px solid #000; width: 640px;" />
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
@@ -14,7 +16,7 @@
             .withUrl("/cameraHub")
             .build();
 
-        connection.on("ReceiveFrame", function (base64Image) {
+        connection.on("ReceiveFrame", function (camera, base64Image) {
             const byteCharacters = atob(base64Image);
             const byteNumbers = new Array(byteCharacters.length);
             for (let i = 0; i < byteCharacters.length; i++) {
@@ -25,8 +27,12 @@
             const blob = new Blob([byteArray], { type: 'image/jpeg' });
             const imageUrl = URL.createObjectURL(blob);
 
-            const img = document.getElementById("liveStream");
-            img.src = imageUrl;
+            const img = document.getElementById("camera_" + camera);
+
+            if (img) {
+                img.src = imageUrl;
+            }
+            
         });
 
 

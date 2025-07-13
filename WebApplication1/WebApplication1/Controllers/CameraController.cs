@@ -12,8 +12,9 @@ public class CameraController : ControllerBase
     }
 
     [HttpPost("/upload")]
-    public async Task<IActionResult> Upload()
+    public async Task<IActionResult> Upload([FromQuery] string camera)
     {
+        
         using var ms = new MemoryStream();
         await Request.Body.CopyToAsync(ms);
         var bytes = ms.ToArray();
@@ -21,7 +22,7 @@ public class CameraController : ControllerBase
 
         Console.WriteLine($"Received frame {bytes}, base64 length: {base64.Length}");
 
-        await _hub.Clients.All.SendAsync("ReceiveFrame", base64);
+        await _hub.Clients.All.SendAsync("ReceiveFrame", camera, base64);
         return Ok();
     }
 }

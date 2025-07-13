@@ -5,7 +5,9 @@
 //dane wifi
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
-const char* serverUrl = "http://192.168.1.101:5000/upload"; // IP serwera
+char* serverAdress = "http://192.168.1.101:5000"; // IP serwera
+//const char* serverQuery = "/upload?camera=balkon";
+const char* serverQuery = "/upload?camera=drzwi";
 
 #define CAMERA_MODEL_AI_THINKER
 
@@ -59,7 +61,7 @@ void setup() {
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
 
-  // Rozdzielczość i jakość
+  // rozdzielczość i jakość
   config.frame_size = FRAMESIZE_QVGA; // FRAMESIZE_SVGA, UXGA, QVGA, ...
   config.jpeg_quality = 4;           // 0-63 (niższa = lepsza jakość)
   config.fb_count = 2;
@@ -72,10 +74,11 @@ void setup() {
   }
 
   // Łączenie z Wi-Fi
+
   WiFi.begin(ssid, password);
   Serial.print("Łączenie z WiFi");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(2000);
     Serial.print(".");
   }
   Serial.println();
@@ -84,20 +87,28 @@ void setup() {
   Serial.println(WiFi.localIP());
 }
 
-void loop() {
-  camera_fb_t *fb = esp_camera_fb_get();
-  if (!fb) return;
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(serverUrl);
-    http.addHeader("Content-Type", "image/jpeg");
-    int httpResponseCode = http.POST(fb->buf, fb->len);
-    http.end();
-    
-  }
+unsigned long lastTime = 0;
+unsigned long timerDelay = 60;
 
-  esp_camera_fb_return(fb);
-  delay(30); // 
+void loop() {
+  if(millis() - lastTime > timerDelay){
+    camera_fb_t *fb = esp_camera_fb_get();
+    if (!fb) return;
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      String url = String(serverAdress) + String(serverQuery);
+      http.begin(url);
+      http.addHeader("Content-Type", "image/jpeg");
+      int httpResponseCode = http.POST(fb->buf, fb->len);
+      Serial.println(httpResponseCode);
+      http.end();
+      
+    }
+
+    esp_camera_fb_return(fb);
+    lastTime = millis();
+  }
+ 
 }
 
