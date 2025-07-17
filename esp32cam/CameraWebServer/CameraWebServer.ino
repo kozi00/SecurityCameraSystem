@@ -5,9 +5,9 @@
 //dane wifi
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
-char* serverAdress = "http://192.168.1.101:5000"; // IP serwera
-//const char* serverQuery = "/upload?camera=balkon";
-const char* serverQuery = "/upload?camera=drzwi";
+char* serverAdress = "http://192.168.1.101:8080"; // IP serwera
+//const char* endpoint = "/upload?camera=balkon";
+const char* endpoint = "/upload?camera=drzwi";
 
 #define CAMERA_MODEL_AI_THINKER
 
@@ -88,7 +88,7 @@ void setup() {
 }
 
 unsigned long lastTime = 0;
-unsigned long timerDelay = 60;
+unsigned long timerDelay = 100;
 
 void loop() {
   if(millis() - lastTime > timerDelay){
@@ -97,7 +97,7 @@ void loop() {
     
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
-      String url = String(serverAdress) + String(serverQuery);
+      String url = String(serverAdress) + String(endpoint);
       http.begin(url);
       http.addHeader("Content-Type", "image/jpeg");
       int httpResponseCode = http.POST(fb->buf, fb->len);

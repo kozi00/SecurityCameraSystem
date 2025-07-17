@@ -1,0 +1,327 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitoringu - Kamery Bezpieczeństwa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .cameras-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .camera-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .camera-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .camera-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .camera-icon {
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .camera-container {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+        }
+
+        .camera-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        .camera-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(45deg, #f7fafc 25%, #edf2f7 25%, #edf2f7 50%, #f7fafc 50%, #f7fafc 75%, #edf2f7 75%);
+            background-size: 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+            font-size: 1.1em;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #f56565;
+            transition: background 0.3s ease;
+        }
+
+        .status-indicator.online {
+            background: #48bb78;
+            box-shadow: 0 0 10px rgba(72, 187, 120, 0.5);
+        }
+
+        .connection-status {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .status-badge.connected {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-badge.disconnected {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        @media (max-width: 768px) {
+            .cameras-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .camera-card {
+                padding: 20px;
+            }
+        }
+
+        .loading {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 System Monitoringu</h1>
+            <p>Podgląd kamer bezpieczeństwa w czasie rzeczywistym</p>
+        </div>
+
+        <div class="cameras-grid">
+            <div class="camera-card">
+                <div class="camera-title">
+                    <div class="camera-icon">📹</div>
+                    Kamera Balkon
+                </div>
+                <div class="camera-container">
+                    <div class="camera-placeholder">Oczekiwanie na sygnał z kamery...</div>
+                    <div class="status-indicator" id="status_balkon"></div>
+                    <img id="camera_balkon" class="camera-image" style="display: none;" />
+                </div>
+            </div>
+
+            <div class="camera-card">
+                <div class="camera-title">
+                    <div class="camera-icon">🚪</div>
+                    Kamera Drzwi
+                </div>
+                <div class="camera-container">
+                    <div class="camera-placeholder">Oczekiwanie na sygnał z kamery...</div>
+                    <div class="status-indicator" id="status_drzwi"></div>
+                    <img id="camera_drzwi" class="camera-image" style="display: none;" />
+                </div>
+            </div>
+        </div>
+
+        <div class="connection-status">
+            <div id="connection-badge" class="status-badge disconnected">
+                <div class="status-dot"></div>
+                <span>Łączenie z serwerem...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = new WebSocket("ws://" + location.host + "/ws");
+        const connectionBadge = document.getElementById('connection-badge');
+        const cameraStatus = {
+            balkon: document.getElementById('status_balkon'),
+            drzwi: document.getElementById('status_drzwi')
+        };
+
+        // Śledzenie aktywności kamer
+        const cameraActivity = {
+            balkon: Date.now(),
+            drzwi: Date.now()
+        };
+
+        function updateConnectionStatus(isConnected) {
+            if (isConnected) {
+                connectionBadge.className = 'status-badge connected';
+                connectionBadge.innerHTML = '<div class="status-dot"></div><span>Połączono z serwerem</span>';
+            } else {
+                connectionBadge.className = 'status-badge disconnected';
+                connectionBadge.innerHTML = '<div class="status-dot"></div><span>Rozłączono z serwerem</span>';
+            }
+        }
+
+        function updateCameraStatus(camera, isActive) {
+            if (cameraStatus[camera]) {
+                cameraStatus[camera].className = isActive ? 'status-indicator online' : 'status-indicator';
+            }
+        }
+
+        function showImage(camera, src) {
+            const img = document.getElementById("camera_" + camera);
+            const placeholder = img.parentNode.querySelector('.camera-placeholder');
+            
+            if (img && placeholder) {
+                img.onload = function() {
+                    placeholder.style.display = 'none';
+                    img.style.display = 'block';
+                    img.style.opacity = '1';
+                };
+                img.src = src;
+                
+                // Aktualizuj aktywność kamery
+                cameraActivity[camera] = Date.now();
+                updateCameraStatus(camera, true);
+            }
+        }
+
+        socket.onmessage = function (event) {
+            try {
+                // Parsowanie JSON z WebSocket
+                const data = JSON.parse(event.data);
+                const base64Image = data.image;
+                const camera = data.camera;
+                
+                if (!base64Image || !camera) {
+                    console.error("Brak wymaganych danych w wiadomości");
+                    return;
+                }
+                
+                // Wyświetl obraz
+                showImage(camera, "data:image/jpeg;base64," + base64Image);
+                
+            } catch (error) {
+                console.error("Błąd podczas parsowania wiadomości WebSocket:", error);
+            }
+        };
+
+        socket.onopen = function(event) {
+            console.log("Połączenie WebSocket nawiązane");
+            updateConnectionStatus(true);
+        };
+
+        socket.onclose = function(event) {
+            console.log("Połączenie WebSocket zamknięte");
+            updateConnectionStatus(false);
+            
+            // Oznacz wszystkie kamery jako offline
+            Object.keys(cameraStatus).forEach(camera => {
+                updateCameraStatus(camera, false);
+            });
+        };
+
+        socket.onerror = function(error) {
+            console.error("Błąd WebSocket:", error);
+            updateConnectionStatus(false);
+        };
+
+        // Sprawdzaj aktywność kamer co 5 sekund
+        setInterval(function() {
+            const now = Date.now();
+            Object.keys(cameraActivity).forEach(camera => {
+                const isActive = (now - cameraActivity[camera]) < 10000; // 10 sekund timeout
+                updateCameraStatus(camera, isActive);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
+
