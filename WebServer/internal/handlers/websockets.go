@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"webserver/internal/services"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,6 +16,7 @@ var Upgrader = websocket.Upgrader{
 }
 var Viewers = make(map[*websocket.Conn]bool)
 var Mu sync.Mutex
+var detectionService = services.NewObjectDetectionService()
 
 func CameraWebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	camera := r.URL.Query().Get("id")
@@ -37,14 +39,6 @@ func CameraWebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		SendImageFromCameraToClients(camera, msg)
 	}
-
-	// body, err := io.ReadAll(r.Body)
-	// if err != nil {
-	// 	log.Printf("Error reading body: %v", err)
-	// 	http.Error(w, "Error reading body", http.StatusBadRequest)
-	// 	return
-	// }
-
 }
 
 func ViewWebsocketHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,8 +65,20 @@ func ViewWebsocketHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SendImageFromCameraToClients(camera string, image []byte) {
+	detections, err := detectionService.DetectObjects(image)
+	if err != nil {
+		log.Printf("Błąd rozpoznawania obiektów: %v", err)
+	}
+
 	encoded := base64.StdEncoding.EncodeToString(image)
-	msg := fmt.Sprintf(`{"camera":"%s","image":"%s"}`, camera, encoded)
+
+	// Dodaj informacje o wykrytych obiektach do wiadomości
+	var detectionsJSON string
+	if detections != nil {
+		detectionsJSON, _ = detectionService.FormatDetectionsAsJSON(detections)
+	}
+
+	msg := fmt.Sprintf(`{"camera":"%s","image":"%s","detections":%s}`, camera, encoded, detectionsJSON)
 
 	Mu.Lock()
 	defer Mu.Unlock()
