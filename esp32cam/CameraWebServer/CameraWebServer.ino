@@ -1,13 +1,18 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WebSocketsClient.h>
 
 //dane wifi
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
-char* serverAdress = "http://192.168.1.101:8080"; // IP serwera
-//const char* endpoint = "/upload?camera=balkon";
-const char* endpoint = "/upload?camera=drzwi";
+
+const char* serverIp = "192.168.1.101"; // IP serwera
+const char* endpoint = "/camera?id=drzwi";
+uint16_t port = 8080;
+//const char* endpoint = "/camera?id=balkon";
+
+WebSocketsClient webSocket;
 
 #define CAMERA_MODEL_AI_THINKER
 
@@ -17,7 +22,7 @@ const char* endpoint = "/upload?camera=drzwi";
 #define XCLK_GPIO_NUM      0
 #define SIOD_GPIO_NUM     26
 #define SIOC_GPIO_NUM     27
-
+#define FLASH_LED 4
 #define Y9_GPIO_NUM       35
 #define Y8_GPIO_NUM       34
 #define Y7_GPIO_NUM       39
@@ -32,6 +37,26 @@ const char* endpoint = "/upload?camera=drzwi";
 #else
 #error "Wybierz poprawny model kamery!"
 #endif
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+	switch(type) {
+		case WStype_DISCONNECTED:
+			Serial.println("[WSc] Disconnected!\n");
+			break;
+		case WStype_CONNECTED:
+			Serial.println("[WSc] Connected\n");
+			break;
+		case WStype_TEXT:
+		case WStype_BIN:
+		case WStype_ERROR:			
+		case WStype_FRAGMENT_TEXT_START:
+		case WStype_FRAGMENT_BIN_START:
+		case WStype_FRAGMENT:
+		case WStype_FRAGMENT_FIN:
+			break;
+	}
+
+}
 
 
 void setup() {
@@ -62,9 +87,9 @@ void setup() {
   config.pixel_format = PIXFORMAT_JPEG;
 
   // rozdzielczość i jakość
-  config.frame_size = FRAMESIZE_QVGA; // FRAMESIZE_SVGA, UXGA, QVGA, ...
-  config.jpeg_quality = 4;           // 0-63 (niższa = lepsza jakość)
-  config.fb_count = 2;
+  config.frame_size = FRAMESIZE_VGA; // FRAMESIZE_SVGA, UXGA, QVGA, ...
+  config.jpeg_quality = 6;           // 0-63 (niższa = lepsza jakość)
+  config.fb_count = 1;
 
   // Inicjalizacja kamery
   esp_err_t err = esp_camera_init(&config);
@@ -78,37 +103,49 @@ void setup() {
   WiFi.begin(ssid, password);
   Serial.print("Łączenie z WiFi");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(2000);
+    digitalWrite(FLASH_LED, HIGH);
+    delay(1000);
     Serial.print(".");
+    digitalWrite(FLASH_LED, LOW);
+    delay(1000);
   }
   Serial.println();
   Serial.println("Połączono z WiFi!");
   Serial.print("Adres IP: ");
   Serial.println(WiFi.localIP());
+
+  webSocket.begin(serverIp, port, endpoint);
+  webSocket.onEvent(webSocketEvent);
+  webSocket.setReconnectInterval(5000);
 }
 
 unsigned long lastTime = 0;
-unsigned long timerDelay = 100;
+unsigned long timerDelay = 200;
 
 void loop() {
+  webSocket.loop();
   if(millis() - lastTime > timerDelay){
     camera_fb_t *fb = esp_camera_fb_get();
     if (!fb) return;
     
     if (WiFi.status() == WL_CONNECTED) {
-      HTTPClient http;
-      String url = String(serverAdress) + String(endpoint);
-      http.begin(url);
-      http.addHeader("Content-Type", "image/jpeg");
-      int httpResponseCode = http.POST(fb->buf, fb->len);
-      Serial.println(httpResponseCode);
-      http.end();
+      // String url = String(serverAdress) + String(endpoint);
+      // http.begin(url);
+      // http.addHeader("Content-Type", "image/jpeg");
+      // int httpResponseCode = http.POST(fb->buf, fb->len);
+      // Serial.println(httpResponseCode);
+      // http.end();
+      // ^--przesylanie po http 
+      if(webSocket.isConnected()){
+        webSocket.sendBIN(fb->buf, fb->len);
+      }
+      else{
+        Serial.println("Problem with connecting websocket");
+      }
       
     }
-
     esp_camera_fb_return(fb);
     lastTime = millis();
   }
  
 }
-

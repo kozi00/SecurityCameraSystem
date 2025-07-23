@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie - System Monitoringu</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="security-icon">🔒</div>
+            <h1>Logowanie</h1>
+            <p>System Monitoringu Kamer</p>
+        </div>
+
+        <form action="/login" method="post">
+            <div class="form-group">
+                <label for="password">Hasło:</label>
+                <input type="password" id="password" name="password" required placeholder="Wprowadź hasło dostępu">
+            </div>
+            <button type="submit" class="login-button">Zaloguj się</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.logout-button {
+    color: white;
+    text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    transition: background 0.3s ease;
+}
+
+.logout-button:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.cameras-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.camera-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.camera-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.camera-title {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.camera-icon {
+    width: 24px;
+    height: 24px;
+    background: #667eea;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+
+.camera-container {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+}
+
+.camera-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: opacity 0.3s ease;
+}
+
+.camera-placeholder {
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(45deg, #f7fafc 25%, #edf2f7 25%, #edf2f7 50%, #f7fafc 50%, #f7fafc 75%, #edf2f7 75%);
+    background-size: 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    font-size: 1.1em;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+
+
+
+
+.status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #f56565;
+    transition: background 0.3s ease;
+}
+
+.status-indicator.online {
+    background: #48bb78;
+    box-shadow: 0 0 10px rgba(72, 187, 120, 0.5);
+}
+
+.connection-status {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9em;
+}
+
+.status-badge.connected {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.status-badge.disconnected {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+@media (max-width: 768px) {
+    .cameras-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .header h1 {
+        font-size: 2em;
+    }
+    
+    .camera-card {
+        padding: 20px;
+    }
+}
+
+.loading {
+    opacity: 0.7;
+}
+
+/* Login page styles */
+.login-container {
+    max-width: 400px;
+    margin: 10% auto;
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    animation: fadeIn 0.5s ease-in;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.security-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    color: #667eea;
+}
+
+.login-header h1 {
+    color: #4a5568;
+    font-size: 2em;
+    margin-bottom: 10px;
+    text-shadow: none;
+}
+
+.login-header p {
+    color: #718096;
+    font-size: 1em;
+    opacity: 1;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: #f7fafc;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: white;
+}
+
+.login-button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Login page responsive */
+@media (max-width: 768px) {
+    .login-container {
+        margin: 5% 20px;
+        padding: 30px 25px;
+    }
+    
+    .security-icon {
+        font-size: 2.5em;
+    }
+    
+    .login-header h1 {
+        font-size: 1.8em;
+    }
+}
