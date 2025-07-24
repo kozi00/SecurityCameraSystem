@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-
 	"webserver/internal/handlers"
 	"webserver/internal/middleware"
 )
