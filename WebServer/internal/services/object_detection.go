@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"image"
-	"image/color"
 	"log"
+	"os"
 
 	"gocv.io/x/gocv"
 )
@@ -18,7 +18,6 @@ type DetectionResult struct {
 	Y          int     `json:"y"`
 	Width      int     `json:"width"`
 	Height     int     `json:"height"`
-	Camera     string  `json:"camera"`
 }
 
 // ObjectDetectionService serwis do rozpoznawania obiektów
@@ -29,21 +28,43 @@ type ObjectDetectionService struct {
 	net         gocv.Net // sieć do detekcji obiektów
 }
 
-// NewObjectDetectionService tworzy nowy serwis detekcji
-func NewObjectDetectionService() *ObjectDetectionService {
-	return &ObjectDetectionService{
-		enabled:     true,
-		hasPrevious: false,
-		net:         gocv.ReadNet("D:\\2025Scripts\\SecurityCameraSystem\\WebServer\\internal\\services\\frozen_inference_graph.pb", "D:\\2025Scripts\\SecurityCameraSystem\\WebServer\\internal\\services\\ssd_mobilenet_v1_coco_2017_11_17.pbtxt"),
-	}
-}
-
 func (ods *ObjectDetectionService) Close() {
 	if ods.hasPrevious {
 		ods.previousMat.Close()
 		ods.hasPrevious = false
 	}
 	ods.net.Close()
+}
+
+// NewObjectDetectionService tworzy nowy serwis detekcji
+func NewObjectDetectionService() *ObjectDetectionService {
+	service := &ObjectDetectionService{
+		enabled:     true,
+		hasPrevious: false,
+	}
+
+	// pelne sciezki
+	modelPath := "D:\\2025Scripts\\SecurityCameraSystem\\WebServer\\internal\\services\\AI\\frozen_inference_graph.pb"
+	configPath := "D:\\2025Scripts\\SecurityCameraSystem\\WebServer\\internal\\services\\AI\\ssd_mobilenet_v1_coco_2017_11_17.pbtxt"
+
+	// Sprawdź czy pliki istnieją
+	if _, err := os.Stat(modelPath); os.IsNotExist(err) {
+		log.Printf("uwaga: ścieżka do załadowania modelu jest nieprawidłowa: %s", modelPath)
+		return nil
+	}
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		log.Printf("uwaga: ścieżka do załadowania sieci jest nieprawidłowa: %s", configPath)
+		return nil
+	}
+
+	service.net = gocv.ReadNet(modelPath, configPath)
+	if service.net.Empty() {
+		log.Printf("nie można załadować modelu AI z plików: %s, %s", modelPath, configPath)
+		return nil
+	}
+
+	log.Printf("Model detekcji obiektów załadowany pomyślnie")
+	return service
 }
 
 // DetectObjects wykrywa obiekty na obrazie
@@ -69,10 +90,6 @@ func (ods *ObjectDetectionService) DetectObjects(imageData []byte) ([]DetectionR
 	detections := ods.net.Forward("")
 	defer detections.Close()
 
-	// Przetwórz wyniki
-	var results []DetectionResult
-	rows := detections.Total() / 7
-
 	// Mapowanie klas COCO (dla MobileNet SSD)
 	classNames := map[int]string{
 		1:  "osoba",
@@ -85,6 +102,15 @@ func (ods *ObjectDetectionService) DetectObjects(imageData []byte) ([]DetectionR
 		15: "kot",
 		16: "pies",
 	}
+	results := ods.PerformDetection(&mat, &detections, classNames)
+
+	log.Printf("Wykryto %d obiektów na obrazie", len(results))
+	return results, nil
+}
+
+func (ods *ObjectDetectionService) PerformDetection(mat *gocv.Mat, detections *gocv.Mat, classNames map[int]string) []DetectionResult {
+	rows := detections.Total() / 7
+	var results []DetectionResult
 
 	for i := 0; i < int(rows); i++ {
 		confidence := detections.GetFloatAt(0, i+2)
@@ -125,22 +151,7 @@ func (ods *ObjectDetectionService) DetectObjects(imageData []byte) ([]DetectionR
 				className, confidence*100, x, y, width, height)
 		}
 	}
-
-	log.Printf("Wykryto %d obiektów na obrazie", len(results))
-	return results, nil
-}
-
-func performDetection(frame *gocv.Mat, results gocv.Mat) {
-	for i := 0; i < results.Total(); i += 7 {
-		confidence := results.GetFloatAt(0, i+2)
-		if confidence > 0.5 {
-			left := int(results.GetFloatAt(0, i+3) * float32(frame.Cols()))
-			top := int(results.GetFloatAt(0, i+4) * float32(frame.Rows()))
-			right := int(results.GetFloatAt(0, i+5) * float32(frame.Cols()))
-			bottom := int(results.GetFloatAt(0, i+6) * float32(frame.Rows()))
-			gocv.Rectangle(frame, image.Rect(left, top, right, bottom), color.RGBA{0, 255, 0, 0}, 2)
-		}
-	}
+	return results
 }
 
 // AnalyzeImageForMotion analizuje obraz pod kątem ruchu
@@ -189,10 +200,6 @@ func (ods *ObjectDetectionService) DetectMotion(imageData []byte) (bool, error) 
 
 	// Zapisz aktualną klatkę jako poprzednią (kopiuj dane)
 	currentMat.CopyTo(&ods.previousMat)
-
-	if motionDetected {
-		log.Printf("RUCH WYKRYTY!")
-	}
 
 	return motionDetected, nil
 }

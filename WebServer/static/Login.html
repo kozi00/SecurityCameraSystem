@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logowanie - System Monitoringu</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/static/css/login.css">
 </head>
 <body>
     <div class="login-container">
@@ -14,7 +14,7 @@
             <p>System Monitoringu Kamer</p>
         </div>
 
-        <form action="/login" method="post">
+        <form action="/auth/login" method="post">
             <div class="form-group">
                 <label for="password">Hasło:</label>
                 <input type="password" id="password" name="password" required placeholder="Wprowadź hasło dostępu">

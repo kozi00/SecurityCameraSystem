@@ -9,14 +9,20 @@ import (
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		// Pozwól na dostęp do strony logowania, api kamery,  i zasobów statycznych bez uwierzytelnienia
-		if r.URL.Path == "/login" ||
-			r.URL.Path == "/Login.html" ||
-			strings.HasPrefix(r.URL.Path, "/css/") ||
-			strings.HasPrefix(r.URL.Path, "/js/") ||
-			strings.HasPrefix(r.URL.Path, "/camera") {
-			next.ServeHTTP(w, r)
-			return
+		// ✅ PUBLICZNE ŚCIEŻKI
+		publicPaths := []string{
+			"/login",
+			"/auth/login",
+			"/api/camera",
+			"/static/css/login.css",
+		}
+
+		// Sprawdź publiczne ścieżki
+		for _, path := range publicPaths {
+			if strings.HasPrefix(r.URL.Path, path) {
+				next.ServeHTTP(w, r)
+				return
+			}
 		}
 
 		// Sprawdź czy użytkownik jest zalogowany

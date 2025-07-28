@@ -6,7 +6,7 @@ import (
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.ServeFile(w, r, "static/Login.html") // Serve the login form
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	password := r.FormValue("password")

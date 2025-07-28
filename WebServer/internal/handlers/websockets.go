@@ -65,28 +65,24 @@ func ViewWebsocketHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SendImageFromCameraToClients(camera string, image []byte) {
-	// motionDetected, err := detectionService.DetectMotion(image)
-	// if err != nil {
-	// 	log.Printf("Błąd rozpoznawania obiektów: %v", err)
-	// }
-
-	// var detectionsJSON string
-
-	// if motionDetected {
-	// 	detections, _ := detectionService.DetectObjects(image)
-
-	// 	detectionsJSON, err = detectionService.FormatDetectionsAsJSON(detections)
-	// 	if err != nil {
-	// 		log.Printf("Błąd formatowania detekcji do JSON: %v", err)
-	// 	}
-	// } else {
-	// 	detectionsJSON = "[]"
-	// }
-	detections, _ := detectionService.DetectObjects(image)
-	detectionsJSON, err := detectionService.FormatDetectionsAsJSON(detections)
+	motionDetected, err := detectionService.DetectMotion(image)
 	if err != nil {
-		log.Printf("Błąd formatowania detekcji do JSON: %v", err)
+		log.Printf("Błąd rozpoznawania obiektów: %v", err)
 	}
+
+	var detectionsJSON string
+
+	if motionDetected {
+		detections, _ := detectionService.DetectObjects(image)
+
+		detectionsJSON, err = detectionService.FormatDetectionsAsJSON(detections)
+		if err != nil {
+			log.Printf("Błąd formatowania detekcji do JSON: %v", err)
+		}
+	} else {
+		detectionsJSON = "[]"
+	}
+
 	encoded := base64.StdEncoding.EncodeToString(image)
 
 	msg := fmt.Sprintf(`{"camera":"%s","image":"%s", "detections":%s}`, camera, encoded, detectionsJSON)

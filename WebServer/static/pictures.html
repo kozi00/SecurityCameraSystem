@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria zdjęć</title>
+    <link rel="stylesheet" href="/static/css/pictures.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Galeria zdjęć z kamer</h1>
+
+        <div id="sizeBar" class="size-bar">
+            <div class="size-header">
+                <span class="size-text">0 GB / 3 GB</span>
+                <span class="size-details">Wolne: 3 GB (100%)</span>
+            </div>
+            <div class="size-progress-container">
+                <div class="size-progress" style="width: 0%;"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="page-size">
+                <label>Na stronę: 
+                    <select id="pageSize" onchange="changePageSize()">
+                        <option value="12">12</option>
+                        <option value="24" selected>24</option>
+                        <option value="48">48</option>
+                    </select>
+                </label>
+            </div>
+            <div id="info"></div>
+        </div>
+        
+        <div id="gallery" class="gallery"></div>
+        
+        <div id="pagination" class="pagination"></div>
+        
+        <div id="loading" class="loading" style="display: none;">Ładowanie...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="empty" class="empty" style="display: none;">
+            <h3>Brak zdjęć</h3>
+            <p>Galeria jest pusta</p>
+        </div>
+    </div>
+
+    <script src="/static/js/pictures.js"></script>
+    <script src="/static/js/navbar.js"></script>
+
+</body>
+</html>

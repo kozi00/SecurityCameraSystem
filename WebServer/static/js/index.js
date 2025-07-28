@@ -20,8 +20,8 @@ class CameraMonitor {
     }
 
     connectWebSocket() {
-        this.socket = new WebSocket("ws://" + location.host + "/view");
-        
+        this.socket = new WebSocket("ws://" + location.host + "/api/view");
+
         this.socket.onmessage = (event) => this.handleMessage(event);
         this.socket.onopen = (event) => this.handleOpen(event);
         this.socket.onclose = (event) => this.handleClose(event);
