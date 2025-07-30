@@ -23,8 +23,8 @@ func Load() *Config {
 	return &Config{
 		Port:                     getEnvAsInt("PORT", 8080),
 		Password:                 getEnv("PASSWORD", "sienkiewicza2"),
-		ModelPath:                getEnv("MODEL_PATH", filepath.Join(".", "internal", "services", "AI", "yolov4-tiny.weights")),
-		ConfigPath:               getEnv("CONFIG_PATH", filepath.Join(".", "internal", "services", "AI", "yolov4-tiny.cfg")),
+		ModelPath:                getEnv("MODEL_PATH", filepath.Join(".", "internal", "services", "ai", "yolov4-tiny.weights")),
+		ConfigPath:               getEnv("CONFIG_PATH", filepath.Join(".", "internal", "services", "ai", "yolov4-tiny.cfg")),
 		ImageDirectory:           getEnv("IMAGE_DIR", filepath.Join(".", "static", "images")),
 		ImageBufferLimit:         getEnvAsInt("BUFFER_LIMIT", 7),
 		ImageBufferFlushInterval: getEnvAsInt("FLUSH_INTERVAL", 30),
