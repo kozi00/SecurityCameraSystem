@@ -32,10 +32,11 @@ func NewBufferService(imagesDir string, bufferLimit int) *BufferService {
 }
 
 func (s *BufferService) Run(flushInterval int) {
-	ticker := time.NewTicker(time.Duration(flushInterval) * time.Minute)
-	defer ticker.Stop()
+	ticker := time.NewTicker(time.Duration(flushInterval) * time.Second)
 
-	for range ticker.C {
+	defer ticker.Stop()
+	for {
+		<-ticker.C
 		s.FlushImages()
 	}
 }
@@ -52,28 +53,10 @@ func (s *BufferService) AddImage(imageData []byte, camera, object string) {
 		Data:      imageData,
 	}
 
-	s.images = append(s.images, image)
-
-	if len(s.images) >= s.bufferLimit {
-		go s.FlushImages()
+	if len(s.images) < s.bufferLimit {
+		log.Printf("Buffer size: %d/%d", len(s.images), s.bufferLimit)
+		s.images = append(s.images, image)
 	}
-}
-
-func (s *BufferService) SaveImage(imageData []byte, camera string) error {
-	timestamp := time.Now().Format("2006-01-02_15-04-05")
-	filename := fmt.Sprintf("%s_%s.jpg", camera, timestamp)
-	filepath := fmt.Sprintf("%s/%s", s.imagesDir, filename)
-
-	if err := os.MkdirAll(s.imagesDir, 0755); err != nil {
-		return fmt.Errorf("failed to create directory: %v", err)
-	}
-
-	if err := os.WriteFile(filepath, imageData, 0644); err != nil {
-		return fmt.Errorf("failed to save image: %v", err)
-	}
-
-	log.Printf("Image saved: %s", filename)
-	return nil
 }
 
 func (s *BufferService) FlushImages() {
@@ -90,7 +73,7 @@ func (s *BufferService) FlushImages() {
 	}
 
 	for _, image := range s.images {
-		filename := fmt.Sprintf("%s_%s_%s.jpg", image.Camera, image.Timestamp, image.Object)
+		filename := fmt.Sprintf("%s_%s_%s.jpg", image.Timestamp, image.Camera, image.Object)
 		filepath := fmt.Sprintf("%s/%s", s.imagesDir, filename)
 
 		if err := os.WriteFile(filepath, image.Data, 0644); err != nil {

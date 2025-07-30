@@ -13,6 +13,7 @@ type Config struct {
 	ImageDirectory           string
 	ImageBufferLimit         int
 	ImageBufferFlushInterval int
+	MotionThreshold          int
 }
 
 func Load() *Config {
@@ -22,8 +23,9 @@ func Load() *Config {
 		ModelPath:                getEnv("MODEL_PATH", "D:\\2025Scripts\\SecurityCameraSystem\\WebServer\\internal\\services\\AI\\frozen_inference_graph.pb"),
 		ConfigPath:               getEnv("CONFIG_PATH", "D:\\2025Scripts\\SecurityCameraSystem\\WebServer\\internal\\services\\AI\\ssd_mobilenet_v1_coco_2017_11_17.pbtxt"),
 		ImageDirectory:           getEnv("IMAGE_DIR", "D:\\2025Scripts\\SecurityCameraSystem\\WebServer\\static\\images"),
-		ImageBufferLimit:         getEnvAsInt("BUFFER_LIMIT", 20),
-		ImageBufferFlushInterval: getEnvAsInt("FLUSH_INTERVAL", 5),
+		ImageBufferLimit:         getEnvAsInt("BUFFER_LIMIT", 7),
+		ImageBufferFlushInterval: getEnvAsInt("FLUSH_INTERVAL", 30),
+		MotionThreshold:          getEnvAsInt("MOTION_THRESHOLD", 10000), // Default threshold for motion detection
 	}
 }
 

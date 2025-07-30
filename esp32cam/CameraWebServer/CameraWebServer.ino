@@ -7,7 +7,7 @@
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
-const char* serverIp = "192.168.1.33"; // IP serwera
+const char* serverIp = "192.168.1.101"; // IP serwera
 const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 8080;
 //const char* endpoint = "/api/camera?id=balkon";

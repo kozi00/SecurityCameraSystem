@@ -1,9 +1,9 @@
 package ai
 
 import (
-	"encoding/json"
 	"fmt"
 	"image"
+	"image/color"
 	"log"
 	"os"
 
@@ -12,28 +12,30 @@ import (
 
 // DetectionResult reprezentuje wynik detekcji obiektu
 type DetectionResult struct {
-	Label      string  `json:"label"`
-	Confidence float64 `json:"confidence"`
-	X          int     `json:"x"`
-	Y          int     `json:"y"`
-	Width      int     `json:"width"`
-	Height     int     `json:"height"`
+	Label      string
+	Confidence float64
+	X          int
+	Y          int
+	Width      int
+	Height     int
 }
 
 // Service serwis do rozpoznawania obiektów
 type DetectorService struct {
-	previousMat gocv.Mat
-	hasPrevious bool     // flaga do sprawdzania czy mamy poprzednią klatkę (false jesli zaczynamy program)
-	net         gocv.Net // sieć do detekcji obiektów
-	modelPath   string
-	configPath  string
+	previousMat     gocv.Mat
+	hasPrevious     bool     // flaga do sprawdzania czy mamy poprzednią klatkę (false jesli zaczynamy program)
+	net             gocv.Net // sieć do detekcji obiektów
+	modelPath       string
+	configPath      string
+	motionThreshold int
 }
 
 // NewService tworzy nowy serwis detekcji
-func NewDetectorService(modelPath, configPath string) *DetectorService {
+func NewDetectorService(modelPath, configPath string, motionThreshold int) *DetectorService {
 	service := &DetectorService{
-		modelPath:  modelPath,
-		configPath: configPath,
+		modelPath:       modelPath,
+		configPath:      configPath,
+		motionThreshold: motionThreshold,
 	}
 
 	if err := service.initializeNet(); err != nil {
@@ -101,8 +103,8 @@ func (s *DetectorService) DetectMotion(imageBytes []byte) (bool, error) {
 	s.previousMat.Close()
 	s.previousMat = mat.Clone()
 
-	// Motion detected if more than 1000 pixels changed
-	motionDetected := nonZeroPixels > 1000
+	// Motion detected if more than motionThreshold pixels changed
+	motionDetected := nonZeroPixels > s.motionThreshold
 
 	if motionDetected {
 		log.Printf("Motion detected: %d pixels changed", nonZeroPixels)
@@ -138,14 +140,15 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 	var results []DetectionResult
 
 	// Process detections
-	for i := 0; i < output.Total(); i += 7 {
-		confidence := output.GetFloatAt(0, i+2)
-		if confidence > 0.5 { // Confidence threshold
-			classID := int(output.GetFloatAt(0, i+1))
-			x := int(output.GetFloatAt(0, i+3) * float32(mat.Cols()))
-			y := int(output.GetFloatAt(0, i+4) * float32(mat.Rows()))
-			width := int(output.GetFloatAt(0, i+5)*float32(mat.Cols())) - x
-			height := int(output.GetFloatAt(0, i+6)*float32(mat.Rows())) - y
+	outputReshaped := output.Reshape(1, output.Total()/7)
+	for i := 0; i < outputReshaped.Rows(); i++ {
+		confidence := outputReshaped.GetFloatAt(i, 2)
+		if confidence > 0.5 {
+			classID := int(outputReshaped.GetFloatAt(i, 1))
+			x := int(outputReshaped.GetFloatAt(i, 3) * float32(mat.Cols()))
+			y := int(outputReshaped.GetFloatAt(i, 4) * float32(mat.Rows()))
+			width := int(outputReshaped.GetFloatAt(i, 5)*float32(mat.Cols())) - x
+			height := int(outputReshaped.GetFloatAt(i, 6)*float32(mat.Rows())) - y
 
 			results = append(results, DetectionResult{
 				Label:      getClassLabel(classID),
@@ -155,35 +158,58 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 				Width:      width,
 				Height:     height,
 			})
+			log.Printf("Detected %s ", results[len(results)-1].Label)
 		}
 	}
 
 	return results, nil
 }
 
-// FormatDetectionsAsJSON formatuje wyniki detekcji do JSON
-func (s *DetectorService) FormatDetectionsAsJSON(detections []DetectionResult) (string, error) {
-	jsonBytes, err := json.Marshal(detections)
+// DrawRectangle rysuje prostokąty na obrazie
+func (s *DetectorService) DrawRectangle(detections []DetectionResult, img []byte) ([]byte, error) {
+	red := color.RGBA{R: 255, G: 0, B: 0, A: 0}
+
+	mat, err := gocv.IMDecode(img, gocv.IMReadColor)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal detections: %v", err)
+		return nil, fmt.Errorf("failed to decode image: %v", err)
 	}
-	return string(jsonBytes), nil
+	defer mat.Close()
+
+	for _, detection := range detections {
+		rect := image.Rect(detection.X, detection.Y, detection.X+detection.Width, detection.Y+detection.Height)
+		gocv.Rectangle(&mat, rect, red, 2)
+
+		// Opcjonalnie: dodaj etykietę klasy
+		label := fmt.Sprintf("%s (%.2f)", detection.Label, detection.Confidence)
+		pt := image.Pt(detection.X, detection.Y-5)
+		gocv.PutText(&mat, label, pt, gocv.FontHersheySimplex, 0.5, red, 1)
+	}
+
+	buf, err := gocv.IMEncode(".jpg", mat)
+	if err != nil {
+		log.Printf("Failed to encode image: %v", err)
+		return nil, err
+	}
+	defer buf.Close()
+	finalImage := make([]byte, len(buf.GetBytes()))
+	copy(finalImage, buf.GetBytes())
+
+	return finalImage, nil
 }
 
 // getClassLabel zwraca etykietę klasy dla danego ID
 func getClassLabel(classID int) string {
 	labels := map[int]string{
-		1:  "person",
-		2:  "bicycle",
-		3:  "car",
-		4:  "motorcycle",
-		5:  "airplane",
-		6:  "bus",
-		7:  "train",
-		8:  "truck",
-		9:  "boat",
-		10: "traffic light",
-		// Add more labels as needed
+		1:  "osoba",
+		2:  "rower",
+		3:  "samochód",
+		4:  "motocykl",
+		5:  "samolot",
+		6:  "autobus",
+		8:  "ciężarówka",
+		16: "ptak",
+		17: "kot",
+		18: "pies",
 	}
 
 	if label, exists := labels[classID]; exists {

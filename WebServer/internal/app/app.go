@@ -22,7 +22,7 @@ type App struct {
 func NewApp() *App {
 	cfg := config.Load()
 
-	detector := ai.NewDetectorService(cfg.ModelPath, cfg.ConfigPath)
+	detector := ai.NewDetectorService(cfg.ModelPath, cfg.ConfigPath, cfg.MotionThreshold)
 	buffer := storage.NewBufferService(cfg.ImageDirectory, cfg.ImageBufferLimit)
 	hub := websocket.NewHubService()
 
