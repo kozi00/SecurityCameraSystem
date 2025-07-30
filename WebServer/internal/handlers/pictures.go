@@ -2,12 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 )
 
 const imagesDir = "./static/images/"
@@ -72,18 +69,8 @@ func DisplayPicturesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(data)
 }
+
 func ViewPictureHandler(w http.ResponseWriter, r *http.Request) {
 	image := r.URL.Query().Get("image")
 	http.ServeFile(w, r, imagesDir+image)
-}
-
-func CreatePicture(data []byte, camera string, object string) {
-	timestamp := time.Now().Format("2006-01-02_15-04-05")
-	fileName := fmt.Sprintf("%s_%s_%s.jpg", camera, object, timestamp)
-	err := os.WriteFile(imagesDir+fileName, data, 0644) //0644 - uprawnienia do odczytu i zapisu dla właściciela, odczytu dla grupy i innych
-	if err != nil {
-		log.Fatalf("Błąd zapisu pliku: %v", err)
-	}
-
-	log.Println("Zapisano plik jako", fileName)
 }

@@ -1,12 +1,12 @@
-package main
+package routes
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"webserver/internal/handlers"
 	"webserver/internal/middleware"
+	"webserver/internal/services"
 )
 
 func dynamicHTMLHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,26 +30,25 @@ func dynamicHTMLHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filePath)
 }
 
-func main() {
+func SetupRoutes(manager *services.Manager) http.Handler {
 	mux := http.NewServeMux()
 
+	// Static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	// ✅ API ENDPOINTS (logika w Go)
-	mux.HandleFunc("/api/view", handlers.ViewWebsocketHandler)
-	mux.HandleFunc("/api/camera", handlers.CameraWebsocketHandler)
+
+	// API endpoints - używaj Manager bezpośrednio
+	mux.HandleFunc("/api/view", handlers.ViewWebsocketHandler(manager))
+	mux.HandleFunc("/api/camera", handlers.CameraWebsocketHandler(manager))
 	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler)
 	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler)
-	//mux.HandleFunc("/api/settings", handlers.SettingsHandler)
 
+	// Auth endpoints
 	mux.HandleFunc("/auth/login", handlers.LoginHandler)
 	mux.HandleFunc("/auth/logout", handlers.LogoutHandler)
 
+	// Dynamic HTML handler
 	mux.HandleFunc("/", dynamicHTMLHandler)
 
-	// Owiń mux w AuthMiddleware
-	handler := middleware.AuthMiddleware(mux)
-
-	fmt.Println("Server running on http://localhost:8080")
-	fmt.Println("Access requires login with password: sienkiewicza2")
-	http.ListenAndServe("0.0.0.0:8080", handler)
+	// Apply middleware
+	return middleware.AuthMiddleware(mux)
 }
