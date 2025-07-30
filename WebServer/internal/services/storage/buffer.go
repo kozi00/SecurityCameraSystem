@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 )
@@ -74,9 +75,9 @@ func (s *BufferService) FlushImages() {
 
 	for _, image := range s.images {
 		filename := fmt.Sprintf("%s_%s_%s.jpg", image.Timestamp, image.Camera, image.Object)
-		filepath := fmt.Sprintf("%s/%s", s.imagesDir, filename)
+		fullpath := filepath.Join(s.imagesDir, filename)
 
-		if err := os.WriteFile(filepath, image.Data, 0644); err != nil {
+		if err := os.WriteFile(fullpath, image.Data, 0644); err != nil {
 			log.Printf("Error saving image %s: %v", filename, err)
 			continue
 		}
