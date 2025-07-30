@@ -26,7 +26,7 @@ func NewApp() *App {
 	buffer := storage.NewBufferService(cfg.ImageDirectory, cfg.ImageBufferLimit)
 	hub := websocket.NewHubService()
 
-	mng := services.NewManager(detector, buffer, hub)
+	mng := services.NewManager(detector, buffer, hub, cfg.ProcessingWorkers, cfg.ProcessingInterval)
 
 	return &App{
 		config:          cfg,
