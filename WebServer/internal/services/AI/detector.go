@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"sync"
 
 	"gocv.io/x/gocv"
 )
@@ -20,11 +21,17 @@ type DetectionResult struct {
 	Height     int
 }
 
-// Service serwis do rozpoznawania obiektów
+type CameraState struct {
+	previousMat gocv.Mat
+	hasPrevious bool
+	mutex       sync.Mutex
+}
+
+// DetectorService serwis do rozpoznawania obiektów
 type DetectorService struct {
-	previousMat     gocv.Mat
-	hasPrevious     bool     // flaga do sprawdzania czy mamy poprzednią klatkę (false jesli zaczynamy program)
-	net             gocv.Net // sieć do detekcji obiektów
+	cameraStates    map[string]*CameraState // State dla każdej kamery osobno
+	statesMutex     sync.RWMutex            // Mutex do mapy states
+	net             gocv.Net
 	modelPath       string
 	configPath      string
 	motionThreshold int
@@ -33,6 +40,7 @@ type DetectorService struct {
 // NewService tworzy nowy serwis detekcji
 func NewDetectorService(modelPath, configPath string, motionThreshold int) *DetectorService {
 	service := &DetectorService{
+		cameraStates:    make(map[string]*CameraState),
 		modelPath:       modelPath,
 		configPath:      configPath,
 		motionThreshold: motionThreshold,
@@ -55,7 +63,6 @@ func (s *DetectorService) initializeNet() error {
 		return fmt.Errorf("config file not found: %s", s.configPath)
 	}
 
-	//net := gocv.ReadNetFromONNX(s.modelPath)
 	net := gocv.ReadNet(s.modelPath, s.configPath)
 
 	if net.Empty() {
@@ -69,26 +76,62 @@ func (s *DetectorService) initializeNet() error {
 	return nil
 }
 
+func (s *DetectorService) getCameraState(cameraID string) *CameraState {
+	s.statesMutex.RLock()
+	state, exists := s.cameraStates[cameraID]
+	s.statesMutex.RUnlock()
+
+	if exists {
+		return state
+	}
+
+	// Tworzymy nowy state
+	s.statesMutex.Lock()
+	defer s.statesMutex.Unlock()
+
+	// Double-check (może zostać utworzony przez inny wątek)
+	if state, exists := s.cameraStates[cameraID]; exists {
+		return state
+	}
+
+	state = &CameraState{
+		hasPrevious: false,
+	}
+	s.cameraStates[cameraID] = state
+	log.Printf("Created motion detection state for camera: %s", cameraID)
+
+	return state
+}
+
 // DetectMotion wykrywa ruch między klatkami
-func (s *DetectorService) DetectMotion(imageBytes []byte) (bool, error) {
+func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool, error) {
 	// Convert bytes to Mat
+	state := s.getCameraState(cameraID)
+	state.mutex.Lock()
+	defer state.mutex.Unlock()
+
 	mat, err := gocv.IMDecode(imageBytes, gocv.IMReadColor)
 	if err != nil {
 		return false, fmt.Errorf("failed to decode image: %v", err)
 	}
 	defer mat.Close()
 
-	if !s.hasPrevious {
-		s.previousMat = mat.Clone()
-		s.hasPrevious = true
-		return false, nil // Pierwsza klatka - brak ruchu
+	if mat.Empty() {
+		return false, fmt.Errorf("decoded image is empty")
+	}
+
+	if !state.hasPrevious {
+		state.previousMat = mat.Clone()
+		state.hasPrevious = true
+		log.Printf("Initialized motion detection for camera: %s", cameraID)
+		return false, nil
 	}
 
 	// Calculate difference
 	diff := gocv.NewMat()
 	defer diff.Close()
 
-	gocv.AbsDiff(s.previousMat, mat, &diff)
+	gocv.AbsDiff(state.previousMat, mat, &diff)
 
 	// Convert to grayscale
 	gray := gocv.NewMat()
@@ -104,8 +147,11 @@ func (s *DetectorService) DetectMotion(imageBytes []byte) (bool, error) {
 	nonZeroPixels := gocv.CountNonZero(thresh)
 
 	// Update previous frame
-	s.previousMat.Close()
-	s.previousMat = mat.Clone()
+	state.previousMat.Close()
+	if mat.Empty() {
+		return false, fmt.Errorf("decoded image is empty")
+	}
+	state.previousMat = mat.Clone()
 
 	// Motion detected if more than motionThreshold pixels changed
 	motionDetected := nonZeroPixels > s.motionThreshold
@@ -293,15 +339,20 @@ func (s *DetectorService) GetClassLabel(classID int) string {
 	return fmt.Sprintf("unknown_%d", classID)
 }
 
-// Close zamyka serwis i zwalnia zasoby
-func (s *DetectorService) Close() {
-	if !s.net.Empty() {
-		s.net.Close()
+func (s *DetectorService) GetCameraStats() map[string]bool {
+	s.statesMutex.RLock()
+	defer s.statesMutex.RUnlock()
+
+	stats := make(map[string]bool)
+	for cameraID, state := range s.cameraStates {
+		state.mutex.Lock()
+		stats[cameraID] = state.hasPrevious
+		state.mutex.Unlock()
 	}
-	if s.hasPrevious {
-		s.previousMat.Close()
-	}
+
+	return stats
 }
+
 func getOutputLayers(net gocv.Net) []string {
 	layerNames := net.GetLayerNames()
 	unconnectedOutLayers := net.GetUnconnectedOutLayers()

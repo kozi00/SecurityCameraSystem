@@ -60,6 +60,16 @@ func (m *Manager) HandleCameraImage(image []byte, camera string) {
 	if frameCount%m.processEveryNth != 0 {
 		return // Pomijamy tę klatkę
 	}
+	m.ResetFrameCounter(camera)
+	motionDetected, err := m.detectorService.DetectMotion(image, camera)
+	if err != nil {
+		log.Printf("Błąd rozpoznawania ruchu: %v", err)
+		return
+	}
+
+	if !motionDetected {
+		return
+	}
 
 	select {
 	case m.processingQueue <- ImageProcessingTask{Image: image, Camera: camera}:
@@ -103,15 +113,6 @@ func (m *Manager) processingWorker(workerID int) {
 
 // processImageAsync przetwarza obraz asynchronicznie
 func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
-	motionDetected, err := m.detectorService.DetectMotion(image)
-	if err != nil {
-		log.Printf("Błąd rozpoznawania ruchu: %v", err)
-		return
-	}
-
-	if !motionDetected {
-		return
-	}
 
 	detections, err := m.detectorService.DetectObjects(image)
 	if err != nil {
@@ -138,40 +139,9 @@ func (m *Manager) Stop() {
 	log.Printf("🛑 All processing workers stopped")
 }
 
-// SetProcessingInterval ustawia co którą klatkę przetwarzać (1=każdą, 2=co drugą, 3=co trzecią, etc.)
-func (m *Manager) SetProcessingInterval(interval int) {
-	if interval < 1 {
-		interval = 1
-	}
+func (m *Manager) ResetFrameCounter(cameraId string) {
 	m.frameCounterMu.Lock()
-	m.processEveryNth = interval
+	m.frameCounters[cameraId] = 0
 	m.frameCounterMu.Unlock()
-	log.Printf("🎬 Processing interval changed to every %d frame(s)", interval)
-}
-
-// GetProcessingInterval zwraca aktualny interwał przetwarzania
-func (m *Manager) GetProcessingInterval() int {
-	m.frameCounterMu.Lock()
-	defer m.frameCounterMu.Unlock()
-	return m.processEveryNth
-}
-
-// GetFrameStats zwraca statystyki klatek dla wszystkich kamer
-func (m *Manager) GetFrameStats() map[string]int {
-	m.frameCounterMu.Lock()
-	defer m.frameCounterMu.Unlock()
-
-	stats := make(map[string]int)
-	for camera, count := range m.frameCounters {
-		stats[camera] = count
-	}
-	return stats
-}
-
-// ResetFrameCounters resetuje liczniki klatek
-func (m *Manager) ResetFrameCounters() {
-	m.frameCounterMu.Lock()
-	m.frameCounters = make(map[string]int)
-	m.frameCounterMu.Unlock()
-	log.Printf("🔄 Frame counters reset")
+	log.Printf("🔄 Frame counter reset for camera: %s", cameraId)
 }

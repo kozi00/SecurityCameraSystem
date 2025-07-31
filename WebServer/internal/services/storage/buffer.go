@@ -20,6 +20,7 @@ type BufferService struct {
 	imagesDir   string
 	images      []Image
 	bufferLimit int
+	bufferCount map[string]int // Limit for each camera
 	mu          sync.Mutex
 }
 
@@ -28,6 +29,7 @@ func NewBufferService(imagesDir string, bufferLimit int) *BufferService {
 		imagesDir:   imagesDir,
 		bufferLimit: bufferLimit,
 		images:      make([]Image, 0),
+		bufferCount: make(map[string]int),
 		mu:          sync.Mutex{},
 	}
 }
@@ -42,21 +44,22 @@ func (s *BufferService) Run(flushInterval int) {
 	}
 }
 
-func (s *BufferService) AddImage(imageData []byte, camera, object string) {
+func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	timestamp := time.Now().Format("2006-01-02_15-04-05")
 	image := Image{
 		Timestamp: timestamp,
-		Camera:    camera,
+		Camera:    cameraId,
 		Object:    object,
 		Data:      imageData,
 	}
 
-	if len(s.images) < s.bufferLimit {
+	if s.bufferCount[cameraId] < s.bufferLimit {
 		log.Printf("Buffer size: %d/%d", len(s.images), s.bufferLimit)
 		s.images = append(s.images, image)
+		s.bufferCount[cameraId]++
 	}
 }
 
@@ -85,4 +88,5 @@ func (s *BufferService) FlushImages() {
 
 	log.Printf("Flushed %d images to disk", len(s.images))
 	s.images = s.images[:0] // Clear buffer
+	s.bufferCount = make(map[string]int)
 }
