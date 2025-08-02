@@ -68,8 +68,12 @@ func (s *DetectorService) initializeNet() error {
 	if net.Empty() {
 		return fmt.Errorf("failed to load network")
 	}
-	net.SetPreferableBackend(gocv.NetBackendDefault)
-	net.SetPreferableTarget(gocv.NetTargetCPU)
+	errBackend := net.SetPreferableBackend(gocv.NetBackendDefault)
+	errTarget := net.SetPreferableTarget(gocv.NetTargetCPU)
+
+	if errBackend != nil || errTarget != nil {
+		return fmt.Errorf("failed to set preferable backend or target")
+	}
 
 	s.net = net
 	log.Printf("Detection network initialized successfully")
@@ -180,110 +184,41 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 		return nil, fmt.Errorf("decoded image is empty")
 	}
 
-	originalWidth := mat.Cols()
-	originalHeight := mat.Rows()
-
-	// Tworzenie blob z obrazu - zoptymalizowane parametry
-	blob := gocv.BlobFromImage(
-		mat,
-		1.0/255.0,                  // scalefactor
-		image.Pt(320, 320),         // size - mniejszy dla Orange Pi
-		gocv.NewScalar(0, 0, 0, 0), // mean
-		true,                       // swapRB
-		false,                      // crop
-	)
+	blob := gocv.BlobFromImage(mat, 1.0/127.5, image.Pt(300, 300), gocv.NewScalar(127.5, 127.5, 127.5, 0), true, false)
 	defer blob.Close()
 
 	// Ustaw input dla sieci
 	s.net.SetInput(blob, "")
 
-	// Forward pass przez wszystkie warstwy wyjściowe
-	outputLayers := getOutputLayers(s.net)
-	outputs := s.net.ForwardLayers(outputLayers)
-	defer func() {
-		for i := range outputs {
-			outputs[i].Close()
-		}
-	}()
+	output := s.net.Forward("")
+	defer output.Close()
 
-	// Przetwórz wyniki z wszystkich warstw wyjściowych
-	detections := s.processOutputs(outputs, originalWidth, originalHeight)
-	return detections, nil
-}
+	var results []DetectionResult
 
-// processOutputs przetwarza wyniki z warstw wyjściowych YOLO
-func (s *DetectorService) processOutputs(outputs []gocv.Mat, originalWidth, originalHeight int) []DetectionResult {
-	var detections []DetectionResult
+	// Process detections
+	outputReshaped := output.Reshape(1, output.Total()/7)
+	for i := 0; i < outputReshaped.Rows(); i++ {
+		confidence := outputReshaped.GetFloatAt(i, 2)
+		if confidence > 0.5 {
+			classID := int(outputReshaped.GetFloatAt(i, 1))
+			x := int(outputReshaped.GetFloatAt(i, 3) * float32(mat.Cols()))
+			y := int(outputReshaped.GetFloatAt(i, 4) * float32(mat.Rows()))
+			width := int(outputReshaped.GetFloatAt(i, 5)*float32(mat.Cols())) - x
+			height := int(outputReshaped.GetFloatAt(i, 6)*float32(mat.Rows())) - y
 
-	for _, output := range outputs {
-		rows := output.Size()[0]
-		cols := output.Size()[1]
-
-		for i := 0; i < rows; i++ {
-			// Pobierz dane dla jednego wykrycia
-			data := output.RowRange(i, i+1)
-			defer data.Close()
-
-			// Współrzędne centrum i rozmiary (znormalizowane 0-1)
-			centerX := data.GetFloatAt(0, 0)
-			centerY := data.GetFloatAt(0, 1)
-			width := data.GetFloatAt(0, 2)
-			height := data.GetFloatAt(0, 3)
-
-			// Objectness score
-			objectness := data.GetFloatAt(0, 4)
-
-			// Sprawdź objectness threshold
-			if objectness < 0.5 {
-				continue
-			}
-
-			// Znajdź klasę z najwyższym score
-			maxClassScore := float32(0.0)
-			classID := 0
-
-			// Iteruj przez class scores (zaczynając od indeksu 5)
-			for j := 5; j < cols; j++ {
-				classScore := data.GetFloatAt(0, j)
-				if classScore > maxClassScore {
-					maxClassScore = classScore
-					classID = j - 5
-				}
-			}
-
-			// Oblicz końcowy confidence score
-			finalConfidence := objectness * maxClassScore
-
-			if finalConfidence > 0.5 {
-				// Przelicz współrzędne na pixele
-				pixelCenterX := centerX * float32(originalWidth)
-				pixelCenterY := centerY * float32(originalHeight)
-				pixelWidth := width * float32(originalWidth)
-				pixelHeight := height * float32(originalHeight)
-
-				// Oblicz współrzędne lewego górnego rogu
-				x := int(pixelCenterX - pixelWidth/2)
-				y := int(pixelCenterY - pixelHeight/2)
-
-				// Upewnij się, że współrzędne są w granicach obrazu
-				x = max(0, min(x, originalWidth))
-				y = max(0, min(y, originalHeight))
-				w := max(0, min(int(pixelWidth), originalWidth-x))
-				h := max(0, min(int(pixelHeight), originalHeight-y))
-
-				detections = append(detections, DetectionResult{
-					Label:      s.GetClassLabel(classID),
-					Confidence: float64(finalConfidence),
-					X:          x,
-					Y:          y,
-					Width:      w,
-					Height:     h,
-				})
-			}
+			results = append(results, DetectionResult{
+				Label:      getClassLabel(classID),
+				Confidence: float64(confidence),
+				X:          x,
+				Y:          y,
+				Width:      width,
+				Height:     height,
+			})
+			log.Printf("Detected %s ", results[len(results)-1].Label)
 		}
 	}
 
-	return detections
+	return results, nil
 }
 
 // DrawRectangle rysuje prostokąty na obrazie
@@ -318,19 +253,18 @@ func (s *DetectorService) DrawRectangle(detections []DetectionResult, img []byte
 	return finalImage, nil
 }
 
-// GetClassLabel zwraca etykietę klasy dla danego ID
-func (s *DetectorService) GetClassLabel(classID int) string {
+func getClassLabel(classID int) string {
 	labels := map[int]string{
-		0:  "osoba",
-		1:  "rower",
-		2:  "samochód",
-		3:  "motocykl",
-		4:  "samolot",
-		5:  "autobus",
-		7:  "ciężarówka",
-		14: "ptak",
-		15: "kot",
-		16: "pies",
+		1:  "osoba",
+		2:  "rower",
+		3:  "samochód",
+		4:  "motocykl",
+		5:  "samolot",
+		6:  "autobus",
+		8:  "ciężarówka",
+		16: "ptak",
+		17: "kot",
+		18: "pies",
 	}
 
 	if label, exists := labels[classID]; exists {
@@ -351,18 +285,4 @@ func (s *DetectorService) GetCameraStats() map[string]bool {
 	}
 
 	return stats
-}
-
-func getOutputLayers(net gocv.Net) []string {
-	layerNames := net.GetLayerNames()
-	unconnectedOutLayers := net.GetUnconnectedOutLayers()
-
-	var outputLayers []string
-	for _, i := range unconnectedOutLayers {
-		if i-1 < len(layerNames) {
-			outputLayers = append(outputLayers, layerNames[i-1])
-		}
-	}
-
-	return outputLayers
 }
