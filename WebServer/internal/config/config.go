@@ -23,14 +23,14 @@ func Load() *Config {
 	return &Config{
 		Port:                     getEnvAsInt("PORT", 8080),
 		Password:                 getEnv("PASSWORD", "sienkiewicza2"),
-		ModelPath:                getEnv("MODEL_PATH", filepath.Join(".", "internal", "services", "ai", "mobilenet_iter_73000.caffemodel")),
-		ConfigPath:               getEnv("CONFIG_PATH", filepath.Join(".", "internal", "services", "ai", "deploy.prototxt")),
+		ModelPath:                getEnv("MODEL_PATH", filepath.Join(".", "internal", "services", "ai", "frozen_inference_graph.pb")),
+		ConfigPath:               getEnv("CONFIG_PATH", filepath.Join(".", "internal", "services", "ai", "ssd_mobilenet_v1_coco_2017_11_17.pbtxt")),
 		ImageDirectory:           getEnv("IMAGE_DIR", filepath.Join(".", "static", "images")),
 		ImageBufferLimit:         getEnvAsInt("BUFFER_LIMIT", 7),
 		ImageBufferFlushInterval: getEnvAsInt("FLUSH_INTERVAL", 30),
 		MotionThreshold:          getEnvAsInt("MOTION_THRESHOLD", 10000), // Default threshold for motion detection
 		ProcessingInterval:       getEnvAsInt("PROCESSING_INTERVAL", 3),  // Przetwarzaj co 3. klatkę
-		ProcessingWorkers:        getEnvAsInt("PROCESSING_WORKERS", 5),   // 5 worker threads
+		ProcessingWorkers:        getEnvAsInt("PROCESSING_WORKERS", 3),   // 4 worker threads
 	}
 }
 

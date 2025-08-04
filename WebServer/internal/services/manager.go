@@ -12,7 +12,7 @@ import (
 
 type Manager struct {
 	bufferService    *storage.BufferService
-	detectorService  *ai.DetectorService
+	detectorServices []*ai.DetectorService
 	websocketService *websocket.HubService
 	processingQueue  chan ImageProcessingTask
 	numWorkers       int
@@ -27,9 +27,9 @@ type ImageProcessingTask struct {
 	Camera string
 }
 
-func NewManager(detectorService *ai.DetectorService, bufferService *storage.BufferService, websocketService *websocket.HubService, numWorkers int, processEveryNth int) *Manager {
+func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.BufferService, websocketService *websocket.HubService, numWorkers int, processEveryNth int) *Manager {
 	manager := &Manager{
-		detectorService:  detectorService,
+		detectorServices: detectorServices,
 		bufferService:    bufferService,
 		websocketService: websocketService,
 		numWorkers:       numWorkers,                          // Liczba workerów do przetwarzania obrazów
@@ -48,7 +48,6 @@ func NewManager(detectorService *ai.DetectorService, bufferService *storage.Buff
 }
 
 func (m *Manager) HandleCameraImage(image []byte, camera string) {
-	// 🚀 SZYBKIE: Natychmiast wyślij obraz do widzów (bez opóźnień)
 	m.SendToViewers(image, camera)
 
 	m.frameCounterMu.Lock()
@@ -61,7 +60,9 @@ func (m *Manager) HandleCameraImage(image []byte, camera string) {
 		return // Pomijamy tę klatkę
 	}
 	m.ResetFrameCounter(camera)
-	motionDetected, err := m.detectorService.DetectMotion(image, camera)
+
+	motionDetected, err := m.detectorServices[0].DetectMotion(image, camera)
+
 	if err != nil {
 		log.Printf("Błąd rozpoznawania ruchu: %v", err)
 		return
@@ -94,8 +95,8 @@ func (m *Manager) GetWebsocketService() *websocket.HubService {
 func (m *Manager) GetBufferService() *storage.BufferService {
 	return m.bufferService
 }
-func (m *Manager) GetDetectorService() *ai.DetectorService {
-	return m.detectorService
+func (m *Manager) GetDetectorService() []*ai.DetectorService {
+	return m.detectorServices
 }
 
 // processingWorker przetwarza obrazy w osobnym wątku
@@ -114,7 +115,7 @@ func (m *Manager) processingWorker(workerID int) {
 // processImageAsync przetwarza obraz asynchronicznie
 func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 
-	detections, err := m.detectorService.DetectObjects(image)
+	detections, err := m.detectorServices[workerID].DetectObjects(image)
 	if err != nil {
 		log.Printf("Błąd detekcji obiektów: %v", err)
 		return
@@ -122,7 +123,7 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 
 	if len(detections) > 0 {
 		// Narysuj prostokąty na obrazie
-		imageWithDetections, err := m.detectorService.DrawRectangle(detections, image)
+		imageWithDetections, err := m.detectorServices[workerID].DrawRectangle(detections, image)
 		if err != nil {
 			log.Printf("⚠️  Worker %d: Failed to draw rectangles: %v", workerID, err)
 			imageWithDetections = image // Użyj oryginalnego obrazu
@@ -143,5 +144,4 @@ func (m *Manager) ResetFrameCounter(cameraId string) {
 	m.frameCounterMu.Lock()
 	m.frameCounters[cameraId] = 0
 	m.frameCounterMu.Unlock()
-	log.Printf("🔄 Frame counter reset for camera: %s", cameraId)
 }

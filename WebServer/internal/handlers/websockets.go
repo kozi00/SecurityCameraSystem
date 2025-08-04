@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 	"webserver/internal/services"
 
 	"github.com/gorilla/websocket"
@@ -22,6 +23,11 @@ func CameraWebsocketHandler(manager *services.Manager) http.HandlerFunc {
 			log.Printf("WebSocket upgrade error: %v", err)
 			return
 		}
+		connection.SetReadDeadline(time.Now().Add(60 * time.Second))
+		connection.SetPongHandler(func(appData string) error {
+			connection.SetReadDeadline(time.Now().Add(60 * time.Second))
+			return nil
+		})
 		defer connection.Close()
 
 		log.Printf("Camera connected: %s", camera)
@@ -46,6 +52,12 @@ func ViewWebsocketHandler(manager *services.Manager) http.HandlerFunc {
 			log.Printf("WebSocket upgrade error: %v", err)
 			return
 		}
+		connection.SetReadLimit(512)
+		connection.SetReadDeadline(time.Now().Add(60 * time.Second))
+		connection.SetPongHandler(func(appData string) error {
+			connection.SetReadDeadline(time.Now().Add(60 * time.Second))
+			return nil
+		})
 		defer connection.Close()
 
 		manager.GetWebsocketService().Register(connection)
