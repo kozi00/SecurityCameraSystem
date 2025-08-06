@@ -16,9 +16,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Ustaw cookie po poprawnym logowaniu
 	http.SetCookie(w, &http.Cookie{
-		Name:  "authenticated",
-		Value: "true",
-		Path:  "/",
+		Name:   "authenticated",
+		Value:  "true",
+		Path:   "/",
+		MaxAge: 2592000, // 30 dni
 		// Secure: true, // odkomentuj jeśli używasz HTTPS
 		HttpOnly: true,
 	})

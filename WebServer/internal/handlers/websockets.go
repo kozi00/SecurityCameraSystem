@@ -23,23 +23,31 @@ func CameraWebsocketHandler(manager *services.Manager) http.HandlerFunc {
 			log.Printf("WebSocket upgrade error: %v", err)
 			return
 		}
-		connection.SetReadDeadline(time.Now().Add(60 * time.Second))
-		connection.SetPongHandler(func(appData string) error {
-			connection.SetReadDeadline(time.Now().Add(60 * time.Second))
-			return nil
+
+		connection.SetPingHandler(func(appData string) error {
+			//	log.Printf("Camera %s ping received", camera)
+			connection.SetReadDeadline(time.Now().Add(15 * time.Second))
+			return connection.WriteMessage(websocket.PongMessage, []byte(appData))
 		})
 		defer connection.Close()
 
 		log.Printf("Camera connected: %s", camera)
 
 		for {
-			_, msg, err := connection.ReadMessage()
+			messageType, msg, err := connection.ReadMessage()
 			if err != nil {
 				log.Printf("Error reading camera message: %v", err)
 				break
 			}
 
-			manager.HandleCameraImage(msg, camera)
+			switch messageType {
+			case websocket.TextMessage:
+				log.Printf("Camera %s sent text message: %s", camera, msg)
+			case websocket.BinaryMessage:
+				manager.HandleCameraImage(msg, camera)
+			default:
+				log.Printf("Camera %s sent unsupported message type: %d", camera, messageType)
+			}
 		}
 	}
 }
@@ -52,13 +60,6 @@ func ViewWebsocketHandler(manager *services.Manager) http.HandlerFunc {
 			log.Printf("WebSocket upgrade error: %v", err)
 			return
 		}
-		connection.SetReadLimit(512)
-		connection.SetReadDeadline(time.Now().Add(60 * time.Second))
-		connection.SetPongHandler(func(appData string) error {
-			connection.SetReadDeadline(time.Now().Add(60 * time.Second))
-			return nil
-		})
-		defer connection.Close()
 
 		manager.GetWebsocketService().Register(connection)
 		defer manager.GetWebsocketService().Unregister(connection)
