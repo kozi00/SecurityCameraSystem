@@ -5,25 +5,28 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"webserver/internal/config"
+	"webserver/internal/logger"
 )
 
 type PicturesData struct {
 	Pictures    []string `json:"pictures"`
 	Size        int64    `json:"size"`
+	MaxSize     int64    `json:"maxSize"`
 	Length      int      `json:"length"`
 	TotalPages  int      `json:"totalPages"`
 	CurrentPage int      `json:"currentPage"`
 	Limit       int      `json:"pageSize"`
 }
 
-func DisplayPicturesHandler(imagesDir string) http.HandlerFunc {
+func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		pageString := r.URL.Query().Get("page")
 		limitString := r.URL.Query().Get("limit")
 
 		page, err := strconv.Atoi(pageString)
-		if page <= 0 || err != nil {
+		if page <= 0 || err != nil { //przykladowe wartosci domyslne w przypadku bledow
 			page = 1
 		}
 		limit, err := strconv.Atoi(limitString)
@@ -31,7 +34,7 @@ func DisplayPicturesHandler(imagesDir string) http.HandlerFunc {
 			limit = 10
 		}
 
-		files, err := os.ReadDir(imagesDir)
+		files, err := os.ReadDir(config.ImageDirectory)
 		if err != nil {
 			http.Error(w, "Unable to read pictures directory", http.StatusInternalServerError)
 			return
@@ -62,18 +65,22 @@ func DisplayPicturesHandler(imagesDir string) http.HandlerFunc {
 		data := PicturesData{
 			Pictures:    paginated,
 			Size:        totalSize,
+			MaxSize:     config.MaxImageDirectorySize,
 			Length:      len(pictureFiles),
 			TotalPages:  (len(pictureFiles) + limit - 1) / limit,
 			CurrentPage: page,
 			Limit:       limit,
 		}
-		json.NewEncoder(w).Encode(data)
+		err = json.NewEncoder(w).Encode(data)
+		if err != nil {
+			logger.Error("Error encoding JSON response: %v", err)
+		}
 	}
 }
 
-func ViewPictureHandler(imagesDir string) http.HandlerFunc {
+func ViewPictureHandler(config *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		image := r.URL.Query().Get("image")
-		http.ServeFile(w, r, imagesDir+image)
+		http.ServeFile(w, r, config.ImageDirectory+image)
 	}
 }

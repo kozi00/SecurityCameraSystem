@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"log"
 	"os"
 	"sync"
+	"webserver/internal/config"
+	"webserver/internal/logger"
 
 	"gocv.io/x/gocv"
 )
@@ -21,6 +22,7 @@ type DetectionResult struct {
 	Height     int
 }
 
+// CameraState przechowuje stan detekcji ruchu dla każdej kamery, aby porównać klatki
 type CameraState struct {
 	previousMat gocv.Mat
 	hasPrevious bool
@@ -35,25 +37,28 @@ type DetectorService struct {
 	modelPath       string
 	configPath      string
 	motionThreshold int
+	logger          *logger.Logger
 }
 
 // NewService tworzy nowy serwis detekcji
-func NewDetectorService(modelPath, configPath string, motionThreshold int) *DetectorService {
+func NewDetectorService(config *config.Config, logger *logger.Logger) *DetectorService {
 	service := &DetectorService{
 		cameraStates:    make(map[string]*CameraState),
-		modelPath:       modelPath,
-		configPath:      configPath,
-		motionThreshold: motionThreshold,
+		modelPath:       config.ModelPath,
+		configPath:      config.ConfigPath,
+		motionThreshold: config.MotionThreshold,
+		logger:          logger,
 	}
 
 	if err := service.initializeNet(); err != nil {
-		log.Printf("Warning: Could not initialize detection network: %v", err)
-		return service // Return service anyway, will work in fallback mode
+		service.logger.Warning("Could not initialize detection network: %v", err)
+		return service
 	}
 
 	return service
 }
 
+// initializeNet inicjalizuje sieć detekcji z plików modelu i konfiguracji
 func (s *DetectorService) initializeNet() error {
 	if _, err := os.Stat(s.modelPath); os.IsNotExist(err) {
 		return fmt.Errorf("model file not found: %s", s.modelPath)
@@ -76,7 +81,7 @@ func (s *DetectorService) initializeNet() error {
 	}
 
 	s.net = net
-	log.Printf("Detection network initialized successfully")
+	s.logger.Info("Detection network initialized successfully")
 	return nil
 }
 
@@ -102,7 +107,7 @@ func (s *DetectorService) getCameraState(cameraID string) *CameraState {
 		hasPrevious: false,
 	}
 	s.cameraStates[cameraID] = state
-	log.Printf("Created motion detection state for camera: %s", cameraID)
+	s.logger.Info("Created motion detection state for camera: %s", cameraID)
 
 	return state
 }
@@ -127,21 +132,24 @@ func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool
 	if !state.hasPrevious {
 		state.previousMat = mat.Clone()
 		state.hasPrevious = true
-		log.Printf("Initialized motion detection for camera: %s", cameraID)
+		s.logger.Info("Initialized motion detection for camera: %s", cameraID)
 		return false, nil
 	}
 
 	// Calculate difference
 	diff := gocv.NewMat()
 	defer diff.Close()
-
-	gocv.AbsDiff(state.previousMat, mat, &diff)
-
+	err = gocv.AbsDiff(state.previousMat, mat, &diff)
+	if err != nil {
+		return false, fmt.Errorf("failed to compute absolute difference: %v", err)
+	}
 	// Convert to grayscale
 	gray := gocv.NewMat()
 	defer gray.Close()
-	gocv.CvtColor(diff, &gray, gocv.ColorBGRToGray)
-
+	err = gocv.CvtColor(diff, &gray, gocv.ColorBGRToGray)
+	if err != nil {
+		return false, fmt.Errorf("failed to convert image to grayscale: %v", err)
+	}
 	// Apply threshold
 	thresh := gocv.NewMat()
 	defer thresh.Close()
@@ -161,7 +169,7 @@ func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool
 	motionDetected := nonZeroPixels > s.motionThreshold
 
 	if motionDetected {
-		log.Printf("Motion detected: %d pixels changed", nonZeroPixels)
+		s.logger.Info("Motion detected: %d pixels changed", nonZeroPixels)
 	}
 
 	return motionDetected, nil
@@ -214,7 +222,7 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 				Width:      width,
 				Height:     height,
 			})
-			log.Printf("Detected %s ", results[len(results)-1].Label)
+			s.logger.Info("Detected %s", results[len(results)-1].Label)
 		}
 	}
 
@@ -233,17 +241,23 @@ func (s *DetectorService) DrawRectangle(detections []DetectionResult, img []byte
 
 	for _, detection := range detections {
 		rect := image.Rect(detection.X, detection.Y, detection.X+detection.Width, detection.Y+detection.Height)
-		gocv.Rectangle(&mat, rect, red, 2)
+		err = gocv.Rectangle(&mat, rect, red, 2)
+		if err != nil {
+			return nil, fmt.Errorf("failed to draw rectangle: %v", err)
+		}
 
 		// Opcjonalnie: dodaj etykietę klasy
 		label := fmt.Sprintf("%s (%.2f)", detection.Label, detection.Confidence)
 		pt := image.Pt(detection.X, detection.Y-5)
-		gocv.PutText(&mat, label, pt, gocv.FontHersheySimplex, 0.5, red, 1)
+		err = gocv.PutText(&mat, label, pt, gocv.FontHersheySimplex, 0.5, red, 1)
+		if err != nil {
+			return nil, fmt.Errorf("failed to draw text: %v", err)
+		}
 	}
 
 	buf, err := gocv.IMEncode(".jpg", mat)
 	if err != nil {
-		log.Printf("Failed to encode image: %v", err)
+		s.logger.Error("Failed to encode image: %v", err)
 		return nil, err
 	}
 	defer buf.Close()
@@ -270,19 +284,5 @@ func getClassLabel(classID int) string {
 	if label, exists := labels[classID]; exists {
 		return label
 	}
-	return fmt.Sprintf("unknown_%d", classID)
-}
-
-func (s *DetectorService) GetCameraStats() map[string]bool {
-	s.statesMutex.RLock()
-	defer s.statesMutex.RUnlock()
-
-	stats := make(map[string]bool)
-	for cameraID, state := range s.cameraStates {
-		state.mutex.Lock()
-		stats[cameraID] = state.hasPrevious
-		state.mutex.Unlock()
-	}
-
-	return stats
+	return fmt.Sprintf("nieznany_%d", classID)
 }

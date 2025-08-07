@@ -1,8 +1,9 @@
 package websocket
 
 import (
-	"log"
 	"sync"
+	"webserver/internal/config"
+	"webserver/internal/logger"
 
 	"github.com/gorilla/websocket"
 )
@@ -13,14 +14,16 @@ type HubService struct {
 	register   chan *websocket.Conn
 	unregister chan *websocket.Conn
 	mutex      sync.RWMutex
+	logger     *logger.Logger
 }
 
-func NewHubService() *HubService {
+func NewHubService(config *config.Config, logger *logger.Logger) *HubService {
 	return &HubService{
 		clients:    make(map[*websocket.Conn]bool),
 		broadcast:  make(chan []byte),
 		register:   make(chan *websocket.Conn),
 		unregister: make(chan *websocket.Conn),
+		logger:     logger,
 	}
 }
 
@@ -31,7 +34,7 @@ func (h *HubService) Run() {
 			h.mutex.Lock()
 			h.clients[client] = true
 			h.mutex.Unlock()
-			log.Printf("Client connected. Total: %d", len(h.clients))
+			h.logger.Info("Client connected. Total: %d", len(h.clients))
 
 		case client := <-h.unregister:
 			h.mutex.Lock()
@@ -40,14 +43,14 @@ func (h *HubService) Run() {
 				client.Close()
 			}
 			h.mutex.Unlock()
-			log.Printf("Client disconnected. Total: %d", len(h.clients))
+			h.logger.Info("Client disconnected. Total: %d", len(h.clients))
 
 		case message := <-h.broadcast:
 			h.mutex.RLock()
 			for client := range h.clients {
 				err := client.WriteMessage(websocket.TextMessage, message)
 				if err != nil {
-					log.Printf("Error sending message: %v", err)
+					h.logger.Error("Error sending message: %v", err)
 					delete(h.clients, client)
 					client.Close()
 				}

@@ -1,0 +1,46 @@
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: Detection network initialized successfully
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: Detection network initialized successfully
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: Detection network initialized successfully
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 📁 Images: images
+ℹ️  INFO    2025/08/07 13:31:31 logger.go:82: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: Detection network initialized successfully
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: Detection network initialized successfully
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: Detection network initialized successfully
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 📁 Images: images
+ℹ️  INFO    2025/08/07 13:32:10 logger.go:82: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/07 13:32:14 logger.go:82: Camera connected: drzwi
+ℹ️  INFO    2025/08/07 13:32:14 logger.go:82: Created motion detection state for camera: drzwi
+ℹ️  INFO    2025/08/07 13:32:14 logger.go:82: Initialized motion detection for camera: drzwi
+ℹ️  INFO    2025/08/07 13:32:22 logger.go:82: Motion detected: 17338 pixels changed
+ℹ️  INFO    2025/08/07 13:32:22 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:32:26 logger.go:82: Motion detected: 246081 pixels changed
+ℹ️  INFO    2025/08/07 13:32:26 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:32:27 logger.go:82: Motion detected: 279101 pixels changed
+ℹ️  INFO    2025/08/07 13:32:27 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:32:31 logger.go:82: Motion detected: 170882 pixels changed
+ℹ️  INFO    2025/08/07 13:32:31 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:34:00 logger.go:82: Motion detected: 250817 pixels changed
+ℹ️  INFO    2025/08/07 13:34:00 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:34:01 logger.go:82: Motion detected: 239937 pixels changed
+ℹ️  INFO    2025/08/07 13:34:01 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:34:01 logger.go:82: Detected osoba
+ℹ️  INFO    2025/08/07 13:34:01 logger.go:82: Buffer size for camera drzwi: 0/7
+ℹ️  INFO    2025/08/07 13:34:02 logger.go:82: Motion detected: 236054 pixels changed
+ℹ️  INFO    2025/08/07 13:34:02 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:34:03 logger.go:82: Motion detected: 307198 pixels changed
+ℹ️  INFO    2025/08/07 13:34:03 logger.go:82: 📹 Camera drzwi: Frame 3 queued for processing
+ℹ️  INFO    2025/08/07 13:34:10 logger.go:82: Flushed 1 images to disk

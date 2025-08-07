@@ -96,8 +96,8 @@ function updateSizeBar(data) {
     const sizeBar = document.getElementById('sizeBar');
     if (!sizeBar) return;
 
-    const maxSizeGB = 3; // 3GB maksymalnie
-    const maxSizeBytes = maxSizeGB * 1024 * 1024 * 1024;
+    
+    const maxSizeBytes = data.maxSize * 1024 * 1024 * 1024;
     const currentSizeBytes = data.size || 0;
     const currentSizeGB = currentSizeBytes / (1024 * 1024 * 1024);
     
@@ -120,11 +120,11 @@ function updateSizeBar(data) {
     }
     
     if (sizeText) {
-        sizeText.textContent = `${currentSizeGB.toFixed(2)} GB / ${maxSizeGB} GB`;
+        sizeText.textContent = `${currentSizeGB.toFixed(2)} GB / ${data.maxSize} GB`;
     }
     
     if (sizeDetails) {
-        const freeSpace = maxSizeGB - currentSizeGB;
+        const freeSpace = data.maxSize - currentSizeGB;
         sizeDetails.textContent = `Wolne: ${freeSpace.toFixed(2)} GB (${(100 - percentage).toFixed(1)}%)`;
     }
 }

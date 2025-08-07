@@ -3,8 +3,9 @@ package services
 import (
 	"encoding/base64"
 	"fmt"
-	"log"
 	"sync"
+	"webserver/internal/config"
+	"webserver/internal/logger"
 	"webserver/internal/services/ai"
 	"webserver/internal/services/storage"
 	"webserver/internal/services/websocket"
@@ -14,12 +15,15 @@ type Manager struct {
 	bufferService    *storage.BufferService
 	detectorServices []*ai.DetectorService
 	websocketService *websocket.HubService
-	processingQueue  chan ImageProcessingTask
-	numWorkers       int
-	wg               sync.WaitGroup
-	frameCounters    map[string]int // Licznik klatek dla każdej kamery
-	frameCounterMu   sync.Mutex     // Mutex do ochrony frameCounters
-	processEveryNth  int            // Przetwarzaj co N-tą klatkę
+	logger           *logger.Logger
+
+	processingQueue chan ImageProcessingTask
+	frameCounters   map[string]int // Licznik klatek dla każdej kamery
+	processEveryNth int            // Przetwarzaj co N-tą klatkę
+	numWorkers      int
+
+	frameCounterMu sync.Mutex // Mutex do ochrony frameCounters
+	wg             sync.WaitGroup
 }
 
 type ImageProcessingTask struct {
@@ -27,15 +31,16 @@ type ImageProcessingTask struct {
 	Camera string
 }
 
-func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.BufferService, websocketService *websocket.HubService, numWorkers int, processEveryNth int) *Manager {
+func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.BufferService, websocketService *websocket.HubService, config *config.Config, logger *logger.Logger) *Manager {
 	manager := &Manager{
 		detectorServices: detectorServices,
 		bufferService:    bufferService,
 		websocketService: websocketService,
-		numWorkers:       numWorkers,                          // Liczba workerów do przetwarzania obrazów
+		numWorkers:       config.ProcessingWorkers,            // Liczba workerów do przetwarzania obrazów
 		processingQueue:  make(chan ImageProcessingTask, 100), // Buffer dla 100 zadań
 		frameCounters:    make(map[string]int),                // Liczniki klatek dla każdej kamery
-		processEveryNth:  processEveryNth,                     // Przetwarzaj co N-tą klatkę
+		processEveryNth:  config.ProcessingInterval,           // Przetwarzaj co N-tą klatkę
+		logger:           logger,
 	}
 
 	for i := 0; i < manager.numWorkers; i++ {
@@ -43,7 +48,7 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 		go manager.processingWorker(i)
 	}
 
-	log.Printf("🎬 Manager started - processing every %d frame(s)", manager.processEveryNth)
+	manager.logger.Info("🎬 Manager started - processing every %d frame(s)", manager.processEveryNth)
 	return manager
 }
 
@@ -57,14 +62,14 @@ func (m *Manager) HandleCameraImage(image []byte, camera string) {
 
 	// 🎯 Przetwarzaj tylko co N-tą klatkę
 	if frameCount%m.processEveryNth != 0 {
-		return // Pomijamy tę klatkę
+		return
 	}
 	m.ResetFrameCounter(camera)
 
 	motionDetected, err := m.detectorServices[0].DetectMotion(image, camera)
 
 	if err != nil {
-		log.Printf("Błąd rozpoznawania ruchu: %v", err)
+		m.logger.Error("Error detecting motion: %v", err)
 		return
 	}
 
@@ -74,9 +79,9 @@ func (m *Manager) HandleCameraImage(image []byte, camera string) {
 
 	select {
 	case m.processingQueue <- ImageProcessingTask{Image: image, Camera: camera}:
-		log.Printf("📹 Camera %s: Frame %d queued for processing", camera, frameCount)
+		m.logger.Info("📹 Camera %s: Frame queued for processing", camera)
 	default:
-		log.Printf("⚠️  Processing queue full for camera %s (frame %d) - skipping AI detection", camera, frameCount)
+		m.logger.Warning("⚠️  Processing queue full for camera %s - skipping AI detection", camera)
 	}
 }
 
@@ -103,13 +108,13 @@ func (m *Manager) GetDetectorService() []*ai.DetectorService {
 func (m *Manager) processingWorker(workerID int) {
 	defer m.wg.Done()
 
-	log.Printf("🔧 Processing worker %d started", workerID)
+	m.logger.Info("🔧 Processing worker %d started", workerID)
 
 	for task := range m.processingQueue {
 		m.processImageAsync(task.Image, task.Camera, workerID)
 	}
 
-	log.Printf("🔧 Processing worker %d stopped", workerID)
+	m.logger.Info("🔧 Processing worker %d stopped", workerID)
 }
 
 // processImageAsync przetwarza obraz asynchronicznie
@@ -117,7 +122,7 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 
 	detections, err := m.detectorServices[workerID].DetectObjects(image)
 	if err != nil {
-		log.Printf("Błąd detekcji obiektów: %v", err)
+		m.logger.Error("Błąd detekcji obiektów: %v", err)
 		return
 	}
 
@@ -125,7 +130,7 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 		// Narysuj prostokąty na obrazie
 		imageWithDetections, err := m.detectorServices[workerID].DrawRectangle(detections, image)
 		if err != nil {
-			log.Printf("⚠️  Worker %d: Failed to draw rectangles: %v", workerID, err)
+			m.logger.Error("Failed to draw rectangles: %v", err)
 			imageWithDetections = image // Użyj oryginalnego obrazu
 		}
 
@@ -137,7 +142,7 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 func (m *Manager) Stop() {
 	close(m.processingQueue)
 	m.wg.Wait()
-	log.Printf("🛑 All processing workers stopped")
+	m.logger.Info("🛑 All processing workers stopped")
 }
 
 func (m *Manager) ResetFrameCounter(cameraId string) {

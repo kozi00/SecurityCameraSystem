@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"webserver/internal/config"
 	"webserver/internal/handlers"
+	"webserver/internal/logger"
 	"webserver/internal/middleware"
 	"webserver/internal/services"
 )
@@ -31,17 +32,17 @@ func dynamicHTMLHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filePath)
 }
 
-func SetupRoutes(manager *services.Manager, cfg *config.Config) http.Handler {
+func SetupRoutes(manager *services.Manager, cfg *config.Config, logger *logger.Logger) http.Handler {
 	mux := http.NewServeMux()
 
 	// Static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// API endpoints - używaj Manager bezpośrednio
-	mux.HandleFunc("/api/view", handlers.ViewWebsocketHandler(manager))
-	mux.HandleFunc("/api/camera", handlers.CameraWebsocketHandler(manager))
-	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler(cfg.ImageDirectory))
-	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler(cfg.ImageDirectory))
+	mux.HandleFunc("/api/view", handlers.ViewWebsocketHandler(manager, logger))
+	mux.HandleFunc("/api/camera", handlers.CameraWebsocketHandler(manager, logger))
+	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler(cfg, logger))
+	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler(cfg))
 
 	// Auth endpoints
 	mux.HandleFunc("/auth/login", handlers.LoginHandler)

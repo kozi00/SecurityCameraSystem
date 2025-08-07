@@ -2,11 +2,12 @@ package storage
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
+	"webserver/internal/config"
+	"webserver/internal/logger"
 )
 
 type Image struct {
@@ -22,14 +23,16 @@ type BufferService struct {
 	bufferLimit int
 	bufferCount map[string]int // Limit for each camera
 	mu          sync.Mutex
+	logger      *logger.Logger
 }
 
-func NewBufferService(imagesDir string, bufferLimit int) *BufferService {
+func NewBufferService(config *config.Config, logger *logger.Logger) *BufferService {
 	return &BufferService{
-		imagesDir:   imagesDir,
-		bufferLimit: bufferLimit,
+		imagesDir:   config.ImageDirectory,
+		bufferLimit: config.ImageBufferLimit,
 		images:      make([]Image, 0),
 		bufferCount: make(map[string]int),
+		logger:      logger,
 		mu:          sync.Mutex{},
 	}
 }
@@ -48,7 +51,7 @@ func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	timestamp := time.Now().Format("2006-01-02_15-04-05")
+	timestamp := time.Now().Format("2006-01-02_15-04-05.000")
 	image := Image{
 		Timestamp: timestamp,
 		Camera:    cameraId,
@@ -57,7 +60,7 @@ func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 	}
 
 	if s.bufferCount[cameraId] < s.bufferLimit {
-		log.Printf("Buffer size: %d/%d", len(s.images), s.bufferLimit)
+		s.logger.Info("Buffer size for camera %s: %d/%d", cameraId, len(s.images), s.bufferLimit)
 		s.images = append(s.images, image)
 		s.bufferCount[cameraId]++
 	}
@@ -72,7 +75,7 @@ func (s *BufferService) FlushImages() {
 	}
 
 	if err := os.MkdirAll(s.imagesDir, 0755); err != nil {
-		log.Printf("Error creating directory: %v", err)
+		s.logger.Error("Error creating directory: %v", err)
 		return
 	}
 
@@ -81,12 +84,12 @@ func (s *BufferService) FlushImages() {
 		fullpath := filepath.Join(s.imagesDir, filename)
 
 		if err := os.WriteFile(fullpath, image.Data, 0644); err != nil {
-			log.Printf("Error saving image %s: %v", filename, err)
+			s.logger.Error("Error saving image %s: %v", filename, err)
 			continue
 		}
 	}
 
-	log.Printf("Flushed %d images to disk", len(s.images))
+	s.logger.Info("Flushed %d images to disk", len(s.images))
 	s.images = s.images[:0] // Clear buffer
 	s.bufferCount = make(map[string]int)
 }
