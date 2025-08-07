@@ -12,6 +12,11 @@ import (
 	"gocv.io/x/gocv"
 )
 
+const (
+	MotionThreshold    = 10000 // Default threshold for motion detection
+	DetectionThreshold = 0.5   // Default threshold for object detection confidence
+)
+
 // DetectionResult reprezentuje wynik detekcji obiektu
 type DetectionResult struct {
 	Label      string
@@ -31,23 +36,21 @@ type CameraState struct {
 
 // DetectorService serwis do rozpoznawania obiektów
 type DetectorService struct {
-	cameraStates    map[string]*CameraState // State dla każdej kamery osobno
-	statesMutex     sync.RWMutex            // Mutex do mapy states
-	net             gocv.Net
-	modelPath       string
-	configPath      string
-	motionThreshold int
-	logger          *logger.Logger
+	cameraStates map[string]*CameraState // State dla każdej kamery osobno
+	statesMutex  sync.RWMutex            // Mutex do mapy states
+	net          gocv.Net
+	modelPath    string
+	configPath   string
+	logger       *logger.Logger
 }
 
 // NewService tworzy nowy serwis detekcji
 func NewDetectorService(config *config.Config, logger *logger.Logger) *DetectorService {
 	service := &DetectorService{
-		cameraStates:    make(map[string]*CameraState),
-		modelPath:       config.ModelPath,
-		configPath:      config.ConfigPath,
-		motionThreshold: config.MotionThreshold,
-		logger:          logger,
+		cameraStates: make(map[string]*CameraState),
+		modelPath:    config.ModelPath,
+		configPath:   config.ConfigPath,
+		logger:       logger,
 	}
 
 	if err := service.initializeNet(); err != nil {
@@ -166,7 +169,7 @@ func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool
 	state.previousMat = mat.Clone()
 
 	// Motion detected if more than motionThreshold pixels changed
-	motionDetected := nonZeroPixels > s.motionThreshold
+	motionDetected := nonZeroPixels > MotionThreshold
 
 	if motionDetected {
 		s.logger.Info("Motion detected: %d pixels changed", nonZeroPixels)
@@ -207,7 +210,7 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 	outputReshaped := output.Reshape(1, output.Total()/7)
 	for i := 0; i < outputReshaped.Rows(); i++ {
 		confidence := outputReshaped.GetFloatAt(i, 2)
-		if confidence > 0.5 {
+		if confidence > DetectionThreshold {
 			classID := int(outputReshaped.GetFloatAt(i, 1))
 			x := int(outputReshaped.GetFloatAt(i, 3) * float32(mat.Cols()))
 			y := int(outputReshaped.GetFloatAt(i, 4) * float32(mat.Rows()))

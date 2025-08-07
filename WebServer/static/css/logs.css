@@ -1,0 +1,167 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.header p {
+    opacity: 0.8;
+    font-size: 1.1em;
+}
+
+.controls {
+    padding: 30px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.log-section {
+    margin-bottom: 25px;
+}
+
+.log-section h3 {
+    margin-bottom: 15px;
+    color: #2d3748;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+}
+
+.log-section h3 span {
+    margin-right: 8px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+    color: white;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+    color: white;
+}
+
+.btn-error {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: white;
+}
+
+.btn-clear {
+    background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+    color: white;
+    font-size: 0.9em;
+}
+
+.btn-clear:hover {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+}
+
+.log-display {
+    padding: 30px;
+    min-height: 400px;
+}
+
+.log-content {
+    background: #1a202c;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.log-content:empty::before {
+    content: "🔍 Wybierz poziom logów powyżej...";
+    color: #a0aec0;
+    font-style: italic;
+}
+
+.loading {
+    text-align: center;
+    color: #718096;
+    font-style: italic;
+}
+
+.footer {
+    background: #2d3748;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.status {
+    background: #48bb78;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        justify-content: center;
+    }
+}

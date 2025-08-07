@@ -1,0 +1,72 @@
+<!-- static/logs.html -->
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Dziennik zdarzeń - Security Camera</title>
+    <link rel="stylesheet" href="/static/css/navbar.css">
+    <link rel="stylesheet" href="/static/css/logs.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Dziennik zdarzeń</h1>
+            <p>Security Camera Server - Monitoring & Diagnostics</p>
+        </div>
+
+        <div class="controls">
+            <!-- INFO LOGS -->
+            <div class="log-section">
+                <h3><span>ℹ️</span>Informacje</h3>
+                <div class="button-group">
+                    <button class="btn btn-info" onclick="loadLogs('info')">
+                        📋 Pokaż Informacje
+                    </button>
+                    <button class="btn btn-clear" onclick="clearLogs('info')">
+                        🗑️ Wyczyść Informacje
+                    </button>
+                </div>
+            </div>
+
+            <!-- WARNING LOGS -->
+            <div class="log-section">
+                <h3><span>⚠️</span>Ostrzeżenia</h3>
+                <div class="button-group">
+                    <button class="btn btn-warning" onclick="loadLogs('warning')">
+                        ⚠️ Pokaż Ostrzeżenia
+                    </button>
+                    <button class="btn btn-clear" onclick="clearLogs('warning')">
+                        🗑️ Wyczyść Ostrzeżenia
+                    </button>
+                </div>
+            </div>
+
+            <!-- ERROR LOGS -->
+            <div class="log-section">
+                <h3><span>❌</span>Błędy</h3>
+                <div class="button-group">
+                    <button class="btn btn-error" onclick="loadLogs('error')">
+                        🚨 Pokaż Błędy
+                    </button>
+                    <button class="btn btn-clear" onclick="clearLogs('error')">
+                        🗑️ Wyczyść Błędy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-display">
+            <div id="log-content" class="log-content"></div>
+        </div>
+
+      
+    </div>
+
+    <script src="/static/js/navbar.js"></script>
+    <script src="/static/js/logs.js"></script>
+</body>
+</html>

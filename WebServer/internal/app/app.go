@@ -47,7 +47,7 @@ func NewApp() *App {
 
 func (a *App) Run() error {
 	// Start background services
-	go a.bufferService.Run(a.config.ImageBufferFlushInterval)
+	go a.bufferService.Run()
 	go a.hubService.Run()
 
 	// Setup routes

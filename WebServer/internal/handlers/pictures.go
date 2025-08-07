@@ -4,9 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"webserver/internal/config"
 	"webserver/internal/logger"
+)
+
+const (
+	MaxImageDirectorySize = 4 // Maksymalny rozmiar katalogu z obrazami w GB
 )
 
 type PicturesData struct {
@@ -36,6 +41,7 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 
 		files, err := os.ReadDir(config.ImageDirectory)
 		if err != nil {
+			logger.Error("Error reading pictures directory: %v", err)
 			http.Error(w, "Unable to read pictures directory", http.StatusInternalServerError)
 			return
 		}
@@ -65,7 +71,7 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 		data := PicturesData{
 			Pictures:    paginated,
 			Size:        totalSize,
-			MaxSize:     config.MaxImageDirectorySize,
+			MaxSize:     MaxImageDirectorySize,
 			Length:      len(pictureFiles),
 			TotalPages:  (len(pictureFiles) + limit - 1) / limit,
 			CurrentPage: page,
@@ -81,6 +87,11 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 func ViewPictureHandler(config *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		image := r.URL.Query().Get("image")
-		http.ServeFile(w, r, config.ImageDirectory+image)
+		if image == "" {
+			http.Error(w, "Image parameter is required", http.StatusBadRequest)
+			return
+		}
+		filePath := filepath.Join(config.ImageDirectory, image)
+		http.ServeFile(w, r, filePath)
 	}
 }

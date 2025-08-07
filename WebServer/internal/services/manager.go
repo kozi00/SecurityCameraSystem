@@ -11,6 +11,12 @@ import (
 	"webserver/internal/services/websocket"
 )
 
+const (
+	ProcessingQueueSize     = 100 // Rozmiar kolejki przetwarzania
+	ProcessingInterval      = 3   // Co którą klatkę przetwarzać (1=każdą, 3=co trzecią)
+	MotionDetectionWorkerId = 0   // Domyślny worker do detekcji ruchu
+)
+
 type Manager struct {
 	bufferService    *storage.BufferService
 	detectorServices []*ai.DetectorService
@@ -19,7 +25,6 @@ type Manager struct {
 
 	processingQueue chan ImageProcessingTask
 	frameCounters   map[string]int // Licznik klatek dla każdej kamery
-	processEveryNth int            // Przetwarzaj co N-tą klatkę
 	numWorkers      int
 
 	frameCounterMu sync.Mutex // Mutex do ochrony frameCounters
@@ -36,19 +41,18 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 		detectorServices: detectorServices,
 		bufferService:    bufferService,
 		websocketService: websocketService,
-		numWorkers:       config.ProcessingWorkers,            // Liczba workerów do przetwarzania obrazów
-		processingQueue:  make(chan ImageProcessingTask, 100), // Buffer dla 100 zadań
-		frameCounters:    make(map[string]int),                // Liczniki klatek dla każdej kamery
-		processEveryNth:  config.ProcessingInterval,           // Przetwarzaj co N-tą klatkę
+		numWorkers:       config.ProcessingWorkers,                            // Liczba workerów do przetwarzania obrazów
+		processingQueue:  make(chan ImageProcessingTask, ProcessingQueueSize), // Kolejnka dla 100 zadań
+		frameCounters:    make(map[string]int),                                // Liczniki klatek dla każdej kamery
 		logger:           logger,
 	}
 
-	for i := 0; i < manager.numWorkers; i++ {
+	for i := manager.numWorkers; i > 0; i-- {
 		manager.wg.Add(1)
 		go manager.processingWorker(i)
 	}
 
-	manager.logger.Info("🎬 Manager started - processing every %d frame(s)", manager.processEveryNth)
+	manager.logger.Info("🎬 Manager started - processing every %d frame(s)", ProcessingInterval)
 	return manager
 }
 
@@ -61,12 +65,12 @@ func (m *Manager) HandleCameraImage(image []byte, camera string) {
 	m.frameCounterMu.Unlock()
 
 	// 🎯 Przetwarzaj tylko co N-tą klatkę
-	if frameCount%m.processEveryNth != 0 {
+	if frameCount%ProcessingInterval != 0 {
 		return
 	}
 	m.ResetFrameCounter(camera)
 
-	motionDetected, err := m.detectorServices[0].DetectMotion(image, camera)
+	motionDetected, err := m.detectorServices[MotionDetectionWorkerId].DetectMotion(image, camera)
 
 	if err != nil {
 		m.logger.Error("Error detecting motion: %v", err)

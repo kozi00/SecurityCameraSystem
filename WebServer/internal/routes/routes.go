@@ -44,6 +44,14 @@ func SetupRoutes(manager *services.Manager, cfg *config.Config, logger *logger.L
 	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler(cfg, logger))
 	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler(cfg))
 
+	mux.HandleFunc("/logs/info", handlers.ShowInfoLogsHandler(cfg))
+	mux.HandleFunc("/logs/warning", handlers.ShowWarningLogsHandler(cfg))
+	mux.HandleFunc("/logs/error", handlers.ShowErrorLogsHandler(cfg))
+
+	mux.HandleFunc("/logs/info/clear", handlers.ClearInfoLogsHandler(logger))
+	mux.HandleFunc("/logs/warning/clear", handlers.ClearWarningLogsHandler(logger))
+	mux.HandleFunc("/logs/error/clear", handlers.ClearErrorLogsHandler(logger))
+
 	// Auth endpoints
 	mux.HandleFunc("/auth/login", handlers.LoginHandler)
 	mux.HandleFunc("/auth/logout", handlers.LogoutHandler)

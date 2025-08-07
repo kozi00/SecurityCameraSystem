@@ -1,0 +1,4 @@
+❌ ERROR   2025/08/07 21:25:03 logger.go:96: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/07 21:27:07 logger.go:96: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/07 22:13:00 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/07 22:18:38 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)

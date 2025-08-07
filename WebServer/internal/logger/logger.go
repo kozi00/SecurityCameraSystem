@@ -6,17 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 	"webserver/internal/config"
-)
-
-// LogLevel reprezentuje poziom logowania
-type LogLevel int
-
-const (
-	INFO LogLevel = iota
-	WARNING
-	ERROR
 )
 
 // Logger struktura główna loggera
@@ -97,29 +87,15 @@ func (l *Logger) Error(format string, v ...interface{}) {
 }
 
 // CleanOldLogs usuwa stare pliki logów (starsze niż 'days' dni)
-func (l *Logger) CleanOldLogs(days int) {
-	cutoff := time.Now().AddDate(0, 0, -days)
-
-	files, err := filepath.Glob(filepath.Join(l.logDir, "*.log"))
+func (l *Logger) CleanLogs(fileName string) {
+	filePath := filepath.Join(l.logDir, fileName)
+	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
-		l.Error("Failed to list log files: %v", err)
-		return
+		l.Error("Błąd przy otwieraniu pliku: %v", err)
 	}
+	defer file.Close()
 
-	for _, file := range files {
-		info, err := os.Stat(file)
-		if err != nil {
-			continue
-		}
-
-		if info.ModTime().Before(cutoff) {
-			if err := os.Remove(file); err != nil {
-				l.Warning("Failed to remove old log file %s: %v", file, err)
-			} else {
-				l.Info("Removed old log file: %s", file)
-			}
-		}
-	}
+	l.Info("Zawartość pliku została usunięta.")
 }
 
 // GetLogStats zwraca statystyki logów

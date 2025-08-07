@@ -10,6 +10,11 @@ import (
 	"webserver/internal/logger"
 )
 
+const (
+	ImageBufferLimit         = 7
+	ImageBufferFlushInterval = 30
+)
+
 type Image struct {
 	Timestamp string
 	Camera    string
@@ -20,7 +25,6 @@ type Image struct {
 type BufferService struct {
 	imagesDir   string
 	images      []Image
-	bufferLimit int
 	bufferCount map[string]int // Limit for each camera
 	mu          sync.Mutex
 	logger      *logger.Logger
@@ -29,7 +33,6 @@ type BufferService struct {
 func NewBufferService(config *config.Config, logger *logger.Logger) *BufferService {
 	return &BufferService{
 		imagesDir:   config.ImageDirectory,
-		bufferLimit: config.ImageBufferLimit,
 		images:      make([]Image, 0),
 		bufferCount: make(map[string]int),
 		logger:      logger,
@@ -37,8 +40,8 @@ func NewBufferService(config *config.Config, logger *logger.Logger) *BufferServi
 	}
 }
 
-func (s *BufferService) Run(flushInterval int) {
-	ticker := time.NewTicker(time.Duration(flushInterval) * time.Second)
+func (s *BufferService) Run() {
+	ticker := time.NewTicker(time.Duration(ImageBufferFlushInterval) * time.Second)
 
 	defer ticker.Stop()
 	for {
@@ -59,8 +62,8 @@ func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 		Data:      imageData,
 	}
 
-	if s.bufferCount[cameraId] < s.bufferLimit {
-		s.logger.Info("Buffer size for camera %s: %d/%d", cameraId, len(s.images), s.bufferLimit)
+	if s.bufferCount[cameraId] < ImageBufferLimit {
+		s.logger.Info("Buffer size for camera %s: %d/%d", cameraId, len(s.images), ImageBufferLimit)
 		s.images = append(s.images, image)
 		s.bufferCount[cameraId]++
 	}

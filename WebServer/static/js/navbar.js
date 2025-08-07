@@ -7,7 +7,7 @@ class Navbar {
         const path = window.location.pathname;
         if (path === '/' || path === '/index.html') return 'podglad';
         if (path.includes('/pictures')) return 'zdjecia';
-        if (path.includes('/settings')) return 'ustawienia';
+        if (path.includes('/logs')) return 'logi';
         return 'podglad';
     }
 
@@ -47,9 +47,9 @@ class Navbar {
                         </a>
                     </li>
                     <li class="navbar-item">
-                        <a href="/settings" class="navbar-link" data-page="ustawienia">
-                            <span class="navbar-icon">⚙️</span>
-                            <span>Ustawienia</span>
+                        <a href="/logs" class="navbar-link" data-page="dziennik">
+                            <span class="navbar-icon">📝</span>
+                            <span>Dziennik zdarzeń</span>
                         </a>
                     </li>
                 </ul>
