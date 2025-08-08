@@ -11,6 +11,31 @@
     <div class="container">
         <h1>Galeria zdjęć z kamer</h1>
 
+        <div class="filters" style="margin:15px 0; background:#f5f7fa; padding:12px 14px; border:1px solid #dfe3e8; border-radius:8px;">
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#444;">Kamera</label><br>
+                    <input type="text" id="filterCamera" placeholder="np. cam1" style="padding:6px 8px; width:130px;">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#444;">Obiekt</label><br>
+                    <input type="text" id="filterObject" placeholder="np. person" style="padding:6px 8px; width:130px;">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#444;">Od daty</label><br>
+                    <input type="date" id="filterAfter" style="padding:6px 8px;">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#444;">Do daty</label><br>
+                    <input type="date" id="filterBefore" style="padding:6px 8px;">
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button id="applyFilters" style="padding:8px 14px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer;">Filtruj</button>
+                    <button id="resetFilters" style="padding:8px 14px; background:#6b7280; color:#fff; border:none; border-radius:6px; cursor:pointer;">Reset</button>
+                </div>
+            </div>
+        </div>
+
         <div id="sizeBar" class="size-bar">
             <div class="size-header">
                 <span class="size-text">0 GB / 3 GB</span>
@@ -48,6 +73,50 @@
 
     <script src="/static/js/pictures.js"></script>
     <script src="/static/js/navbar.js"></script>
+    <script>
+        function getFiltersQuery() {
+            const c = document.getElementById('filterCamera').value.trim();
+            const o = document.getElementById('filterObject').value.trim();
+            const a = document.getElementById('filterAfter').value;
+            const b = document.getElementById('filterBefore').value;
+            const params = new URLSearchParams();
+            if (c) params.set('camera', c);
+            if (o) params.set('object', o);
+            if (a) params.set('after', a);
+            if (b) params.set('before', b);
+            return params.toString();
+        }
+
+        // Patch original loadPictures to include filters
+        const originalLoadPictures = loadPictures;
+        window.loadPictures = async function(page = 1) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('empty').style.display = 'none';
+            const filterQuery = getFiltersQuery();
+            const base = `/api/pictures?page=${page}&limit=${pageSize}`;
+            const url = filterQuery ? base + '&' + filterQuery : base;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayPictures(data);
+                displayPagination(data);
+                updateInfo(data);
+                updateSizeBar(data);
+            } catch (e) {
+                document.getElementById('error').textContent = 'Błąd: ' + e.message;
+                document.getElementById('error').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        document.getElementById('applyFilters').addEventListener('click', () => loadPictures(1));
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            ['filterCamera','filterObject','filterAfter','filterBefore'].forEach(id => document.getElementById(id).value = '');
+            loadPictures(1);
+        });
+    </script>
 
 </body>
 </html>

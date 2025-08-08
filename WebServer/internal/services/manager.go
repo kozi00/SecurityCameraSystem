@@ -57,21 +57,13 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 }
 
 func (m *Manager) HandleCameraImage(image []byte, camera string) {
-	m.SendToViewers(image, camera)
+	m.sendToViewers(image, camera)
 
-	m.frameCounterMu.Lock()
-	m.frameCounters[camera]++
-	frameCount := m.frameCounters[camera]
-	m.frameCounterMu.Unlock()
-
-	// 🎯 Przetwarzaj tylko co N-tą klatkę
-	if frameCount%ProcessingInterval != 0 {
+	if !m.shouldProcessFrame(camera) {
 		return
 	}
-	m.ResetFrameCounter(camera)
 
 	motionDetected, err := m.detectorServices[MotionDetectionWorkerId].DetectMotion(image, camera)
-
 	if err != nil {
 		m.logger.Error("Error detecting motion: %v", err)
 		return
@@ -89,7 +81,20 @@ func (m *Manager) HandleCameraImage(image []byte, camera string) {
 	}
 }
 
-func (m *Manager) SendToViewers(image []byte, camera string) {
+func (m *Manager) shouldProcessFrame(camera string) bool {
+	m.frameCounterMu.Lock()
+	defer m.frameCounterMu.Unlock()
+
+	m.frameCounters[camera]++
+	if m.frameCounters[camera]%ProcessingInterval != 0 {
+		return false
+	}
+	m.frameCounters[camera] = 0
+	m.resetFrameCounter(camera)
+	return true
+}
+
+func (m *Manager) sendToViewers(image []byte, camera string) {
 
 	encoded := base64.StdEncoding.EncodeToString(image)
 	msg := fmt.Sprintf(`{"camera":"%s","image":"%s"}`,
@@ -149,7 +154,7 @@ func (m *Manager) Stop() {
 	m.logger.Info("🛑 All processing workers stopped")
 }
 
-func (m *Manager) ResetFrameCounter(cameraId string) {
+func (m *Manager) resetFrameCounter(cameraId string) {
 	m.frameCounterMu.Lock()
 	m.frameCounters[cameraId] = 0
 	m.frameCounterMu.Unlock()

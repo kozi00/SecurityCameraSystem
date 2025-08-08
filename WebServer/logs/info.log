@@ -62,3 +62,379 @@
 ℹ️  INFO    2025/08/08 00:18:19 logger.go:72: Camera connected: drzwi
 ℹ️  INFO    2025/08/08 00:18:20 logger.go:72: Created motion detection state for camera: drzwi
 ℹ️  INFO    2025/08/08 00:18:20 logger.go:72: Initialized motion detection for camera: drzwi
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 02:15:02 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 02:15:06 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 02:15:13 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 02:15:13 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 02:15:15 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 02:15:56 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 02:16:45 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 02:17:35 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:17:23 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:17:56 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:17:56 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:18:07 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:18:25 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:18:25 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:18:25 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:18:43 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:18:43 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:18:43 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:18:53 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:18:53 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:18:53 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:18:58 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:19:40 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:19:40 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:19:40 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:19:50 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:19:50 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:19:50 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:19:56 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:19:56 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:19:56 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:20:10 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:20:10 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:20:10 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:20:19 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:20:19 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:20:19 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:20:26 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:20:28 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:20:28 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:20:32 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:20:32 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:20:32 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:20:41 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:21:17 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:21:40 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:21:40 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:21:52 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:21:59 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:21:59 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:21:59 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:22:18 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:22:18 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:22:18 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:22:30 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:22:49 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:22:49 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:22:58 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:23:47 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:24:35 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:25:24 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:26:13 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:27:01 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:27:50 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:27:55 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:28:02 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:28:05 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:28:12 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:28:12 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:28:54 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:29:43 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:30:05 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:30:05 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:30:06 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:30:07 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:30:08 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:30:08 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:30:11 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:30:11 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:30:11 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:30:26 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:30:26 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:30:26 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:30:55 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:31:44 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:31:47 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:32:37 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:33:25 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:34:04 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:34:08 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:34:43 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:34:48 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:34:48 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:35:04 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:35:32 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:36:12 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:36:13 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:38:35 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:43:58 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:43:58 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:43:59 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:44:01 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:44:12 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:44:12 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:44:13 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:44:13 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:44:13 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:44:16 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:44:16 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:44:16 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:44:25 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:44:25 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:44:25 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:44:29 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:44:30 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:44:30 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:44:46 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:48:46 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:50:18 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:50:26 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:50:26 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:50:29 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:50:29 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:50:29 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:50:36 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:52:25 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:52:26 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 17:53:48 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 17:54:16 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:54:54 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 17:54:54 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 17:55:05 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:55:53 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:56:41 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:57:29 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:58:18 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 17:59:05 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 18:00:00 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 18:00:22 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 18:00:24 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:00:24 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:00:26 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 18:00:26 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:00:26 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:00:41 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 18:00:54 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 18:00:55 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 18:00:57 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 18:01:15 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:01:15 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:01:22 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 18:01:50 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 18:02:40 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 18:03:37 logger.go:72: Camera connected: drzwi
+ℹ️  INFO    2025/08/08 18:03:48 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:03:48 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:04:31 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 18:04:32 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:04:32 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:14:04 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:14:04 logger.go:72: Client connected. Total: 2
+ℹ️  INFO    2025/08/08 18:14:52 logger.go:72: Client disconnected. Total: 1
+ℹ️  INFO    2025/08/08 18:16:09 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:16:09 logger.go:72: Client connected. Total: 2
+ℹ️  INFO    2025/08/08 18:16:54 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 18:16:55 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 18:17:03 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:17:03 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:17:47 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 18:19:01 logger.go:72: Camera connected: balkon
+ℹ️  INFO    2025/08/08 18:19:02 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:19:02 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:19:09 logger.go:72: Client disconnected. Total: 0
+ℹ️  INFO    2025/08/08 18:19:09 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:19:09 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:19:50 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:19:50 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:19:50 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 18:19:51 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 18:19:52 logger.go:72: Camera connected: balkon
+ℹ️  INFO    2025/08/08 18:19:52 logger.go:72: Viewer connected
+ℹ️  INFO    2025/08/08 18:19:52 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 18:25:12 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 18:25:15 logger.go:72: Camera connected: balkon
+ℹ️  INFO    2025/08/08 18:25:21 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: Detection network initialized successfully
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🎬 Manager started - processing every 3 frame(s)
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 📁 Images: static\images
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🔧 Processing worker 4 started
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/08 18:26:07 logger.go:72: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/08 18:26:10 logger.go:72: Camera connected: balkon
+ℹ️  INFO    2025/08/08 18:26:44 logger.go:72: Client connected. Total: 1
+ℹ️  INFO    2025/08/08 18:29:02 logger.go:72: Camera connected: balkon
+ℹ️  INFO    2025/08/08 18:29:33 logger.go:72: Client connected. Total: 2

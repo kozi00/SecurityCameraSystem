@@ -19,6 +19,4 @@ func main() {
 --Dodac mozliwosc filtrowania i sortowania zdjec
 --Dodac ustawienia (moze)
 --Error reading camera message (need fix)
---Lepsze rozwiazanie do kilku detectorow (szczegolnie w managerze do detect motion)
-
 */

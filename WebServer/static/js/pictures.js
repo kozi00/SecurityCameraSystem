@@ -1,27 +1,50 @@
 let currentPage = 1;
-let pageSize = 24;
+let pageSize = 24; // corresponds to 'limit' param on backend
 let totalPages = 1;
+
+function buildFilterQuery() {
+    // If filter inputs exist (added on Pictures.html) include them
+    const params = new URLSearchParams();
+    const camEl = document.getElementById('filterCamera');
+    const objEl = document.getElementById('filterObject');
+    const afterEl = document.getElementById('filterAfter');
+    const beforeEl = document.getElementById('filterBefore');
+    if (camEl && camEl.value.trim()) params.set('camera', camEl.value.trim());
+    if (objEl && objEl.value.trim()) params.set('object', objEl.value.trim());
+    if (afterEl && afterEl.value) params.set('after', afterEl.value);
+    if (beforeEl && beforeEl.value) params.set('before', beforeEl.value);
+    return params.toString();
+}
 
 
 async function loadPictures(page = 1) {
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('error').style.display = 'none';
-    document.getElementById('empty').style.display = 'none';
+    currentPage = page;
+    const loadingEl = document.getElementById('loading');
+    const errorEl = document.getElementById('error');
+    const emptyEl = document.getElementById('empty');
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (errorEl) errorEl.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    const filterQuery = buildFilterQuery();
+    const baseUrl = `/api/pictures?page=${page}&limit=${pageSize}`;
+    const url = filterQuery ? `${baseUrl}&${filterQuery}` : baseUrl;
 
     try {
-        const response = await fetch(`/api/pictures?page=${page}&size=${pageSize}`);
-        const data = await response.json();     
-        
+        const response = await fetch(url);
+        const data = await response.json();
+
         displayPictures(data);
         displayPagination(data);
         updateInfo(data);
         updateSizeBar(data);
-        
     } catch (error) {
-        document.getElementById('error').textContent = 'Błąd: ' + error.message;
-        document.getElementById('error').style.display = 'block';
+        if (errorEl) {
+            errorEl.textContent = 'Błąd: ' + error.message;
+            errorEl.style.display = 'block';
+        }
     } finally {
-        document.getElementById('loading').style.display = 'none';
+        if (loadingEl) loadingEl.style.display = 'none';
     }
 }
 
@@ -39,7 +62,7 @@ function displayPictures(data) {
         card.className = 'photo-card';
         
         card.innerHTML = `
-            <img src="/static/images/${picture}" 
+            <img src="/images/${picture}" 
                     alt="${picture}"
                     onclick="openPicture('${picture}')"
                     onerror="this.style.display='none'">
@@ -73,7 +96,7 @@ function displayPagination(data) {
         const btn = document.createElement('button');
         btn.textContent = i;
         btn.className = i === data.currentPage ? 'active' : '';
-        btn.onclick = () => loadPictures(i);
+    btn.onclick = () => loadPictures(i);
         pagination.appendChild(btn);
     }
     
@@ -130,7 +153,10 @@ function updateSizeBar(data) {
 }
 
 function changePageSize() {
-    pageSize = parseInt(document.getElementById('pageSize').value);
+    const el = document.getElementById('pageSize');
+    if (el) {
+        pageSize = parseInt(el.value, 10) || 24;
+    }
     loadPictures(1);
 }
 

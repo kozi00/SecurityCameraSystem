@@ -2,3 +2,37 @@
 ❌ ERROR   2025/08/07 21:27:07 logger.go:96: Viewer disconnected: websocket: close 1001 (going away)
 ❌ ERROR   2025/08/07 22:13:00 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
 ❌ ERROR   2025/08/07 22:18:38 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 02:15:15 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:18:25 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:18:43 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:18:53 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:19:40 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:19:50 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:19:56 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:20:10 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:20:19 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:20:26 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:20:32 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:21:17 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:53842: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 17:21:59 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:22:18 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:22:30 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:57030: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 17:27:55 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:56096: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 17:30:11 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:30:26 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:35:04 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:51956: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 17:44:13 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:44:16 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:44:25 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:44:29 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:44:46 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:45942: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 17:50:29 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 17:50:36 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:34572: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 18:00:00 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:38808: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 18:00:25 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 18:00:41 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:58346: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 18:01:22 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:47654: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 18:04:31 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
+❌ ERROR   2025/08/08 18:14:52 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:54680: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 18:17:47 logger.go:86: Viewer disconnected: read tcp 192.168.1.101:8080->192.168.1.19:46304: wsarecv: Istniejące połączenie zostało gwałtownie zamknięte przez zdalnego hosta.
+❌ ERROR   2025/08/08 18:19:09 logger.go:86: Viewer disconnected: websocket: close 1001 (going away)
