@@ -18,5 +18,6 @@ func main() {
 --Dodac przycisk do usuwania zdjec
 --Dodac mozliwosc filtrowania i sortowania zdjec
 --Dodac ustawienia (moze)
---Error reading camera message (need fix)
+--Dodac limit miejsca zdjec
+--Dodac jakas mozliwosc sprawdzenia pamieci wolnej w systemie
 */

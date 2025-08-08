@@ -1,3 +1,5 @@
 Webserver/static/images
 Webserver/.vscode/
-Webserver/logs
+Webserver/logs/error.log
+Webserver/logs/warning.log
+Webserver/logs/info.log

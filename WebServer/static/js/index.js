@@ -34,16 +34,11 @@ class CameraMonitor {
             const data = JSON.parse(event.data);
             const base64Image = data.image;
             const camera = data.camera;
-            const detections = data.detections;
 
             
             if (!base64Image || !camera) {
                 console.error("Brak wymaganych danych w wiadomości");
                 return;
-            }
-            if (detections && detections.length > 0) {
-                this.showDetections(camera, detections);
-                console.log(`Wykryto ${detections.length} obiektów na kamerze ${camera}:`, detections);
             }
             
             this.showImage(camera, "data:image/jpeg;base64," + base64Image);
@@ -106,54 +101,6 @@ class CameraMonitor {
             this.updateCameraStatus(camera, true);
         }
     }
-    showDetections(camera, detections) {
-        const container = document.getElementById("camera_" + camera).parentNode;
-        
-        // Usuń poprzednie wykrycia
-        const oldDetections = container.querySelectorAll('.detection-box');
-        oldDetections.forEach(box => box.remove());
-        
-        // Dodaj nowe wykrycia
-        detections.forEach(detection => {
-            const box = document.createElement('div');
-            box.className = 'detection-box';
-            box.style.cssText = `
-                position: absolute;
-                left: ${detection.x}px;
-                top: ${detection.y}px;
-                width: ${detection.width}px;
-                height: ${detection.height}px;
-                border: 2px solid #ff4444;
-                background: rgba(255, 68, 68, 0.1);
-                pointer-events: none;
-                z-index: 10;
-            `;
-            
-            // Dodaj etykietę
-            const label = document.createElement('div');
-            label.style.cssText = `
-                position: absolute;
-                top: -25px;
-                left: 0;
-                background: #ff4444;
-                color: white;
-                padding: 2px 6px;
-                font-size: 12px;
-                border-radius: 3px;
-            `;
-            label.textContent = `${detection.label} (${Math.round(detection.confidence * 100)}%)`;
-            box.appendChild(label);
-            
-            container.appendChild(box);
-        });
-        
-        // Usuń wykrycia po 3 sekundach
-        setTimeout(() => {
-            const currentDetections = container.querySelectorAll('.detection-box');
-            currentDetections.forEach(box => box.remove());
-        }, 3000);
-    }
-
     startActivityChecker() {
         setInterval(() => {
             const now = Date.now();

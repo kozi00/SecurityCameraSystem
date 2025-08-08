@@ -73,50 +73,6 @@
 
     <script src="/static/js/pictures.js"></script>
     <script src="/static/js/navbar.js"></script>
-    <script>
-        function getFiltersQuery() {
-            const c = document.getElementById('filterCamera').value.trim();
-            const o = document.getElementById('filterObject').value.trim();
-            const a = document.getElementById('filterAfter').value;
-            const b = document.getElementById('filterBefore').value;
-            const params = new URLSearchParams();
-            if (c) params.set('camera', c);
-            if (o) params.set('object', o);
-            if (a) params.set('after', a);
-            if (b) params.set('before', b);
-            return params.toString();
-        }
-
-        // Patch original loadPictures to include filters
-        const originalLoadPictures = loadPictures;
-        window.loadPictures = async function(page = 1) {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('error').style.display = 'none';
-            document.getElementById('empty').style.display = 'none';
-            const filterQuery = getFiltersQuery();
-            const base = `/api/pictures?page=${page}&limit=${pageSize}`;
-            const url = filterQuery ? base + '&' + filterQuery : base;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                displayPictures(data);
-                displayPagination(data);
-                updateInfo(data);
-                updateSizeBar(data);
-            } catch (e) {
-                document.getElementById('error').textContent = 'Błąd: ' + e.message;
-                document.getElementById('error').style.display = 'block';
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
-        }
-
-        document.getElementById('applyFilters').addEventListener('click', () => loadPictures(1));
-        document.getElementById('resetFilters').addEventListener('click', () => {
-            ['filterCamera','filterObject','filterAfter','filterBefore'].forEach(id => document.getElementById(id).value = '');
-            loadPictures(1);
-        });
-    </script>
 
 </body>
 </html>

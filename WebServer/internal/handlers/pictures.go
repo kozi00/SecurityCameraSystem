@@ -15,11 +15,12 @@ import (
 )
 
 const (
-	MaxImageDirectorySize = 4 // Maksymalny rozmiar katalogu z obrazami w GB
+	MaxImageDirectorySize = 2 // Maksymalny rozmiar katalogu z obrazami w GB
 )
 
 type PicturesData struct {
 	Pictures    []string          `json:"pictures"`
+	ImagesDir   string            `json:"imagesDir"`
 	Size        int64             `json:"size"`
 	MaxSize     int64             `json:"maxSize"`
 	Length      int               `json:"length"`
@@ -132,6 +133,7 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 
 		data := PicturesData{
 			Pictures:    filtered[start:end],
+			ImagesDir:   config.ImageDirectory,
 			Size:        totalSize,
 			MaxSize:     MaxImageDirectorySize,
 			Length:      len(filtered),

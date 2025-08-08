@@ -26,7 +26,7 @@ async function loadPictures(page = 1) {
     if (errorEl) errorEl.style.display = 'none';
     if (emptyEl) emptyEl.style.display = 'none';
 
-    const filterQuery = buildFilterQuery();
+    const filterQuery = getFiltersQuery();
     const baseUrl = `/api/pictures?page=${page}&limit=${pageSize}`;
     const url = filterQuery ? `${baseUrl}&${filterQuery}` : baseUrl;
 
@@ -52,7 +52,7 @@ function displayPictures(data) {
     const gallery = document.getElementById('gallery');
     gallery.innerHTML = '';
 
-    if (data.pictures.length === 0) {
+    if (data.length === 0) {
         document.getElementById('empty').style.display = 'block';
         return;
     }
@@ -62,7 +62,7 @@ function displayPictures(data) {
         card.className = 'photo-card';
         
         card.innerHTML = `
-            <img src="/images/${picture}" 
+            <img src="${data.imagesDir}/${picture}" 
                     alt="${picture}"
                     onclick="openPicture('${picture}')"
                     onerror="this.style.display='none'">
@@ -164,5 +164,25 @@ function openPicture(filename) {
     window.open(`/api/pictures/view?image=${encodeURIComponent(filename)}`, '_blank');
 }
 
-// Start
+function getFiltersQuery() {
+        const c = document.getElementById('filterCamera').value.trim();
+        const o = document.getElementById('filterObject').value.trim();
+        const a = document.getElementById('filterAfter').value;
+        const b = document.getElementById('filterBefore').value;
+        const params = new URLSearchParams();
+        if (c) params.set('camera', c);
+        if (o) params.set('object', o);
+        if (a) params.set('after', a);
+        if (b) params.set('before', b);
+        return params.toString();
+    }
+
+document.getElementById('applyFilters').addEventListener('click', () => loadPictures(1));
+document.getElementById('resetFilters').addEventListener('click', () => {
+    ['filterCamera','filterObject','filterAfter','filterBefore'].forEach(id => document.getElementById(id).value = '');
+    loadPictures(1);
+});
+
+    
+
 loadPictures(1);

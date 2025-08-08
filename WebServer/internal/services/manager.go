@@ -47,7 +47,7 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 		logger:           logger,
 	}
 
-	for i := manager.numWorkers; i > 0; i-- {
+	for i := 0; i < manager.numWorkers; i++ {
 		manager.wg.Add(1)
 		go manager.processingWorker(i)
 	}
@@ -59,9 +59,9 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 func (m *Manager) HandleCameraImage(image []byte, camera string) {
 	m.sendToViewers(image, camera)
 
-	if !m.shouldProcessFrame(camera) {
-		return
-	}
+	//	if !m.shouldProcessFrame(camera) {
+	//		return
+	//	}
 
 	motionDetected, err := m.detectorServices[MotionDetectionWorkerId].DetectMotion(image, camera)
 	if err != nil {

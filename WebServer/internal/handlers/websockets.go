@@ -24,14 +24,19 @@ func CameraWebsocketHandler(manager *services.Manager, logger *logger.Logger) ht
 			return
 		}
 
+		connection.SetPingHandler(func(appData string) error {
+			err := connection.SetReadDeadline(time.Now().Add(15 * time.Second))
+			if err != nil {
+				logger.Error("Error setting read deadline: %v", err)
+			}
+			return connection.WriteMessage(websocket.PongMessage, []byte(appData))
+		})
 		defer connection.Close()
 
 		logger.Info("Camera connected: %s", camera)
 
 		for {
 			messageType, msg, err := connection.ReadMessage()
-			connection.SetReadDeadline(time.Now().Add(30 * time.Second))
-
 			if err != nil {
 				logger.Error("Error reading camera message: %v", err)
 				break
