@@ -7,19 +7,13 @@ import (
 )
 
 type Config struct {
-	Port                     int
-	Password                 string
-	ModelPath                string
-	ConfigPath               string
-	ImageDirectory           string
-	ImageBufferLimit         int
-	ImageBufferFlushInterval int
-	ProcessingQueueSize      int // Rozmiar kolejki przetwarzania
-	MotionThreshold          int
-	ProcessingInterval       int   // Co którą klatkę przetwarzać (1=każdą, 3=co trzecią)
-	ProcessingWorkers        int   // Liczba worker threads do przetwarzania
-	MaxImageDirectorySize    int64 // Maksymalny rozmiar katalogu z obrazami w GB
-	LogDirectory             string
+	Port              int
+	Password          string
+	ModelPath         string
+	ConfigPath        string
+	ImageDirectory    string
+	ProcessingWorkers int // Liczba worker threads do przetwarzania
+	LogDirectory      string
 }
 
 func Load() *Config {
@@ -31,7 +25,6 @@ func Load() *Config {
 		ImageDirectory:    getEnv("IMAGE_DIR", filepath.Join(".", "static", "images")),
 		LogDirectory:      getEnv("LOG_DIR", filepath.Join(".", "logs")),
 		ProcessingWorkers: getEnvAsInt("PROCESSING_WORKERS", 4), // 4 worker threads
-
 	}
 }
 

@@ -20,4 +20,6 @@ func main() {
 --Dodac ustawienia (moze)
 --Dodac limit miejsca zdjec
 --Dodac jakas mozliwosc sprawdzenia pamieci wolnej w systemie
+--Opis zdjec
+--Lepszy restart urzadzenia
 */

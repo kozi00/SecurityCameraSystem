@@ -7,12 +7,17 @@ function buildFilterQuery() {
     const params = new URLSearchParams();
     const camEl = document.getElementById('filterCamera');
     const objEl = document.getElementById('filterObject');
-    const afterEl = document.getElementById('filterAfter');
-    const beforeEl = document.getElementById('filterBefore');
+    const timeAfterEl = document.getElementById('filterTimeAfter');
+    const timeBeforeEl = document.getElementById('filterTimeBefore');
+    const dateAfterEl = document.getElementById('filterDateAfter');
+    const dateBeforeEl = document.getElementById('filterDateBefore');
+
     if (camEl && camEl.value.trim()) params.set('camera', camEl.value.trim());
     if (objEl && objEl.value.trim()) params.set('object', objEl.value.trim());
-    if (afterEl && afterEl.value) params.set('after', afterEl.value);
-    if (beforeEl && beforeEl.value) params.set('before', beforeEl.value);
+    if (timeAfterEl && timeAfterEl.value) params.set('timeAfter', timeAfterEl.value);
+    if (timeBeforeEl && timeBeforeEl.value) params.set('timeBefore', timeBeforeEl.value);
+    if (dateAfterEl && dateAfterEl.value) params.set('dateAfter', dateAfterEl.value);
+    if (dateBeforeEl && dateBeforeEl.value) params.set('dateBefore', dateBeforeEl.value);
     return params.toString();
 }
 
@@ -167,19 +172,23 @@ function openPicture(filename) {
 function getFiltersQuery() {
         const c = document.getElementById('filterCamera').value.trim();
         const o = document.getElementById('filterObject').value.trim();
-        const a = document.getElementById('filterAfter').value;
-        const b = document.getElementById('filterBefore').value;
+        const ta = document.getElementById('filterTimeAfter').value;
+        const tb = document.getElementById('filterTimeBefore').value;
+        const da = document.getElementById('filterDateAfter').value;
+        const db = document.getElementById('filterDateBefore').value;
         const params = new URLSearchParams();
         if (c) params.set('camera', c);
         if (o) params.set('object', o);
-        if (a) params.set('after', a);
-        if (b) params.set('before', b);
+        if (ta) params.set('timeAfter', ta);
+        if (tb) params.set('timeBefore', tb);
+        if (da) params.set('dateAfter', da);
+        if (db) params.set('dateBefore', db);
         return params.toString();
     }
 
 document.getElementById('applyFilters').addEventListener('click', () => loadPictures(1));
 document.getElementById('resetFilters').addEventListener('click', () => {
-    ['filterCamera','filterObject','filterAfter','filterBefore'].forEach(id => document.getElementById(id).value = '');
+    ['filterCamera','filterObject','filterTimeAfter','filterTimeBefore','filterDateAfter','filterDateBefore'].forEach(id => document.getElementById(id).value = '');
     loadPictures(1);
 });
 

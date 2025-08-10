@@ -35,11 +35,13 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 		q := r.URL.Query()
 		pageString := q.Get("page")
 		limitString := q.Get("limit")
-		// filters
+
 		cameraFilter := q.Get("camera")
 		objectFilter := q.Get("object")
-		afterStr := q.Get("after") // 2025-08-08 lub RFC3339
-		beforeStr := q.Get("before")
+		timeAfterStr := q.Get("timeAfter")
+		timeBeforeStr := q.Get("timeBefore")
+		dateAfterStr := q.Get("dateAfter")
+		dateBeforeStr := q.Get("dateBefore")
 
 		page, err := strconv.Atoi(pageString)
 		if page <= 0 || err != nil {
@@ -50,16 +52,20 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 			limit = 24
 		}
 
-		var afterTime, beforeTime time.Time
-		if afterStr != "" {
-			if t, err := parseFlexibleDate(afterStr); err == nil {
-				afterTime = t
-			}
+		var dateAfter, dateBefore time.Time
+		if dateAfterStr != "" {
+			dateAfter, _ = time.Parse("2006-01-02", dateAfterStr)
 		}
-		if beforeStr != "" {
-			if t, err := parseFlexibleDate(beforeStr); err == nil {
-				beforeTime = t
-			}
+		if dateBeforeStr != "" {
+			dateBefore, _ = time.Parse("2006-01-02", dateBeforeStr)
+		}
+
+		var timeAfter, timeBefore time.Time
+		if timeAfterStr != "" {
+			timeAfter, _ = time.Parse("15:04", timeAfterStr)
+		}
+		if timeBeforeStr != "" {
+			timeBefore, _ = time.Parse("15:04", timeBeforeStr)
 		}
 
 		entries, err := os.ReadDir(config.ImageDirectory)
@@ -85,32 +91,34 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 			}
 
 			// parse filename pattern: TIMESTAMP_CAMERA_OBJECT.jpg
-			// timestamp layout: 2006-01-02_15-04-05.000
-			parts := strings.SplitN(strings.TrimSuffix(name, filepath.Ext(name)), "_", 3)
-			var ts time.Time
-			if len(parts) >= 2 { // at least timestamp + camera
-				// join first two parts if object exists could have third
-				ts, _ = time.Parse("2006-01-02_15-04-05.000", parts[0]+"_"+strings.Split(parts[1], "_")[0])
+			// timestamp layout: 2006-01-02_15-04_05.000
+			// 2025-08-07 _ 13-34 _ 01.681 _ drzwi _ osoba
+			parts := strings.SplitN(strings.TrimSuffix(name, filepath.Ext(name)), "_", 5)
+			if len(parts) < 5 {
+				logger.Warning("Skipping file with unexpected name format: %s", name)
+				continue
 			}
-			cameraVal := ""
-			objectVal := ""
-			if len(parts) >= 2 {
-				cameraVal = parts[1]
-			}
-			if len(parts) == 3 {
-				objectVal = parts[2]
-			}
+			date, _ := time.Parse("2006-01-02", parts[0])
+			time, _ := time.Parse("15-04", parts[1])
+			cameraVal := parts[3]
+			objectVal := parts[4]
 
 			if cameraFilter != "" && !strings.EqualFold(cameraVal, cameraFilter) {
 				continue
 			}
-			if objectFilter != "" && !strings.Contains(strings.ToLower(objectVal), strings.ToLower(objectFilter)) {
+			if objectFilter != "" && !strings.EqualFold(objectVal, objectFilter) {
 				continue
 			}
-			if !afterTime.IsZero() && ts.Before(afterTime) {
+			if !dateAfter.IsZero() && date.Before(dateAfter) {
 				continue
 			}
-			if !beforeTime.IsZero() && ts.After(beforeTime) {
+			if !dateBefore.IsZero() && date.After(dateBefore) {
+				continue
+			}
+			if !timeAfter.IsZero() && time.Before(timeAfter) {
+				continue
+			}
+			if !timeBefore.IsZero() && time.After(timeBefore) {
 				continue
 			}
 
@@ -141,10 +149,12 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 			CurrentPage: page,
 			Limit:       limit,
 			Filters: map[string]string{
-				"camera": cameraFilter,
-				"object": objectFilter,
-				"after":  afterStr,
-				"before": beforeStr,
+				"camera":     cameraFilter,
+				"object":     objectFilter,
+				"dateAfter":  dateAfterStr,
+				"dateBefore": dateBeforeStr,
+				"timeAfter":  timeAfterStr,
+				"timeBefore": timeBeforeStr,
 			},
 		}
 
@@ -160,7 +170,7 @@ func parseFlexibleDate(v string) (time.Time, error) {
 	if t, err := time.Parse("2006-01-02", v); err == nil {
 		return t, nil
 	}
-	if t, err := time.Parse(time.RFC3339, v); err == nil {
+	if t, err := time.Parse("15-04", v); err == nil {
 		return t, nil
 	}
 	if sec, err := strconv.ParseInt(v, 10, 64); err == nil {

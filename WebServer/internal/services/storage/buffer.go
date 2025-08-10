@@ -54,7 +54,7 @@ func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	timestamp := time.Now().Format("2006-01-02_15-04-05.000")
+	timestamp := time.Now().Format("2006-01-02_15-04_05.000")
 	image := Image{
 		Timestamp: timestamp,
 		Camera:    cameraId,

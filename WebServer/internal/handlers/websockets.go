@@ -71,7 +71,7 @@ func ViewWebsocketHandler(manager *services.Manager, logger *logger.Logger) http
 		for {
 			_, _, err := connection.ReadMessage()
 			if err != nil {
-				logger.Error("Viewer disconnected: %v", err)
+				logger.Warning("Viewer disconnected: %v", err)
 				break
 			}
 		}

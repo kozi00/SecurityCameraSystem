@@ -22,12 +22,20 @@
                     <input type="text" id="filterObject" placeholder="np. person" style="padding:6px 8px; width:130px;">
                 </div>
                 <div>
+                    <label style="font-size:12px; font-weight:600; color:#444;">Od godziny</label><br>
+                    <input type="time" id="filterTimeAfter" style="padding:6px 8px;">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#444;">Do godziny</label><br>
+                    <input type="time" id="filterTimeBefore" style="padding:6px 8px;">
+                </div>
+                <div>
                     <label style="font-size:12px; font-weight:600; color:#444;">Od daty</label><br>
-                    <input type="date" id="filterAfter" style="padding:6px 8px;">
+                    <input type="date" id="filterDateAfter" style="padding:6px 8px;">
                 </div>
                 <div>
                     <label style="font-size:12px; font-weight:600; color:#444;">Do daty</label><br>
-                    <input type="date" id="filterBefore" style="padding:6px 8px;">
+                    <input type="date" id="filterDateBefore" style="padding:6px 8px;">
                 </div>
                 <div style="display:flex; gap:6px;">
                     <button id="applyFilters" style="padding:8px 14px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer;">Filtruj</button>
@@ -38,8 +46,8 @@
 
         <div id="sizeBar" class="size-bar">
             <div class="size-header">
-                <span class="size-text">0 GB / 3 GB</span>
-                <span class="size-details">Wolne: 3 GB (100%)</span>
+                <span class="size-text">0 GB / 2 GB</span>
+                <span class="size-details">Wolne: 2 GB (100%)</span>
             </div>
             <div class="size-progress-container">
                 <div class="size-progress" style="width: 0%;"></div>
