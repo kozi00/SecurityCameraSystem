@@ -82,3 +82,9 @@ func (h *HubService) GetClients() map[*websocket.Conn]bool {
 	}
 	return clients
 }
+
+func (h *HubService) GetClientCount() int {
+	h.mutex.RLock()
+	defer h.mutex.RUnlock()
+	return len(h.clients)
+}

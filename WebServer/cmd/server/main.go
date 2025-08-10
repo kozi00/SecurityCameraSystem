@@ -15,11 +15,5 @@ func main() {
 
 //TODO:
 /*
---Dodac przycisk do usuwania zdjec
---Dodac mozliwosc filtrowania i sortowania zdjec
---Dodac ustawienia (moze)
---Dodac limit miejsca zdjec
---Dodac jakas mozliwosc sprawdzenia pamieci wolnej w systemie
---Opis zdjec
 --Lepszy restart urzadzenia
 */

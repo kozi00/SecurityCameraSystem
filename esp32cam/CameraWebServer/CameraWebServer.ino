@@ -1,4 +1,4 @@
-#include "esp_camera.h"
+\#include "esp_camera.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WebSocketsClient.h>
@@ -7,7 +7,7 @@
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
-const char* serverIp = "192.168.1.33"; // IP serwera
+const char* serverIp = "192.168.1.101"; // IP serwera
 const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 8080;
 //const char* endpoint = "/api/camera?id=balkon";
@@ -55,24 +55,31 @@ WebSocketsClient webSocket;
 #endif
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-	switch(type) {
-		case WStype_DISCONNECTED:
-			Serial.println("[WSc] Disconnected!\n");
-			break;
-		case WStype_CONNECTED:
-			Serial.println("[WSc] Connected\n");
-			break;
-		case WStype_TEXT:
-		case WStype_BIN:
-		case WStype_ERROR:			
-		case WStype_FRAGMENT_TEXT_START:
-		case WStype_FRAGMENT_BIN_START:
-		case WStype_FRAGMENT:
-		case WStype_FRAGMENT_FIN:
-			break;
-	}
-
+    switch(type) {
+        case WStype_DISCONNECTED:
+            Serial.println("[WSc] Disconnected!\n");
+            break;
+        case WStype_CONNECTED:
+            Serial.println("[WSc] Connected\n");
+            break;
+        case WStype_PING: 
+            Serial.println("[WSc] Received ping");
+            break;
+        case WStype_PONG:  
+            Serial.println("[WSc] Received pong");
+            break;
+        case WStype_TEXT:
+        case WStype_BIN:
+        case WStype_ERROR:		
+            Serial.println("Error\n");	
+        case WStype_FRAGMENT_TEXT_START:
+        case WStype_FRAGMENT_BIN_START:
+        case WStype_FRAGMENT:
+        case WStype_FRAGMENT_FIN:
+            break;
+    }
 }
+
 
 
 void setup() {
@@ -132,35 +139,58 @@ void setup() {
   webSocket.begin(serverIp, port, endpoint);
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(5000);
+  webSocket.enableHeartbeat(10000, 3000, 2);
 }
 
-unsigned long lastTime = 0;
-unsigned long timerDelay = 250;
+const unsigned long timerDelay = 250;
+const unsigned long timerWifi = 1000;
+const unsigned long maxWifiAttempts = 30;
 
-void loop() {
-  webSocket.loop();
-  if(millis() - lastTime > timerDelay){
-    camera_fb_t *fb = esp_camera_fb_get();
-    if (!fb) return;
-    
-    if (WiFi.status() == WL_CONNECTED) {
-      // String url = String(serverAdress) + String(endpoint);
-      // http.begin(url);
-      // http.addHeader("Content-Type", "image/jpeg");
-      // int httpResponseCode = http.POST(fb->buf, fb->len);
-      // Serial.println(httpResponseCode);
-      // http.end();
-      // ^--przesylanie po http 
-      if(webSocket.isConnected()){
-        webSocket.sendBIN(fb->buf, fb->len);
+unsigned long lastTime = 0;
+unsigned long lastWiFiCheck = 0;
+unsigned int noWifiCounter = 0;
+
+void CheckWifiConnection(){
+  if (millis() - lastWiFiCheck > timerWifi) {
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("WiFi disconnected! Trying to reconnect...");
+      WiFi.begin(ssid, password);
+      noWifiCounter++;
+
+      if (noWifiCounter >= maxWifiAttempts) { // Po 30 sekundach restart urzadzenia
+        Serial.println("WiFi reconnect failed after 30 tries. Restarting ESP...");
+        noWifiCounter = 0;
+        ESP.restart();
       }
-      else{
-        Serial.println("Problem with connecting websocket");
-      }
-      
+    } else {
+      noWifiCounter = 0;
     }
-    esp_camera_fb_return(fb);
+    lastWiFiCheck = millis();
+  }
+}
+void SendImage(){
+  // Wysyłanie zdjęcia co 'timerDelay' ms
+  if (millis() - lastTime > timerDelay) {
+    camera_fb_t *fb = esp_camera_fb_get();
+    if (fb) {
+      if (WiFi.status() == WL_CONNECTED && webSocket.isConnected()) {
+        bool success = webSocket.sendBIN(fb->buf, fb->len);
+        if (!success) {
+          Serial.println("Failed to send image");
+        }
+      } else {
+        Serial.println("WiFi or WebSocket not connected");
+      }
+      esp_camera_fb_return(fb);
+    } else {
+      Serial.println("Failed to capture image");
+    }
     lastTime = millis();
   }
- 
+}
+
+void loop() {
+  webSocket.loop();  
+  SendImage();
+  CheckWifiConnection();
 }

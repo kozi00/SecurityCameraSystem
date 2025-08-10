@@ -13,7 +13,7 @@ import (
 
 const (
 	ProcessingQueueSize     = 100 // Rozmiar kolejki przetwarzania
-	ProcessingInterval      = 3   // Co którą klatkę przetwarzać (1=każdą, 3=co trzecią)
+	ProcessingInterval      = 2   // Co którą klatkę przetwarzać (1=każdą, 2=co drugą)
 	MotionDetectionWorkerId = 0   // Domyślny worker do detekcji ruchu
 )
 
@@ -57,11 +57,13 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 }
 
 func (m *Manager) HandleCameraImage(image []byte, camera string) {
-	m.sendToViewers(image, camera)
+	if m.websocketService.GetClientCount() > 0 {
+		m.sendToViewers(image, camera)
+	}
 
-	//	if !m.shouldProcessFrame(camera) {
-	//		return
-	//	}
+	if !m.shouldProcessFrame(camera) {
+		return
+	}
 
 	motionDetected, err := m.detectorServices[MotionDetectionWorkerId].DetectMotion(image, camera)
 	if err != nil {

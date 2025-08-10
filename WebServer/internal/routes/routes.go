@@ -43,6 +43,7 @@ func SetupRoutes(manager *services.Manager, cfg *config.Config, logger *logger.L
 	mux.HandleFunc("/api/camera", handlers.CameraWebsocketHandler(manager, logger))
 	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler(cfg, logger))
 	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler(cfg))
+	mux.HandleFunc("/api/pictures/clear", handlers.ClearPicturesHandler(cfg, logger))
 
 	mux.HandleFunc("/logs/info", handlers.ShowInfoLogsHandler(cfg))
 	mux.HandleFunc("/logs/warning", handlers.ShowWarningLogsHandler(cfg))

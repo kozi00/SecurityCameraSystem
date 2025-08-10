@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -94,7 +93,7 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 			// timestamp layout: 2006-01-02_15-04_05.000
 			// 2025-08-07 _ 13-34 _ 01.681 _ drzwi _ osoba
 			parts := strings.SplitN(strings.TrimSuffix(name, filepath.Ext(name)), "_", 5)
-			if len(parts) < 5 {
+			if len(parts) != 5 {
 				logger.Warning("Skipping file with unexpected name format: %s", name)
 				continue
 			}
@@ -163,20 +162,6 @@ func DisplayPicturesHandler(config *config.Config, logger *logger.Logger) http.H
 			logger.Error("Error encoding JSON response: %v", err)
 		}
 	}
-}
-
-// parseFlexibleDate supports YYYY-MM-DD or RFC3339
-func parseFlexibleDate(v string) (time.Time, error) {
-	if t, err := time.Parse("2006-01-02", v); err == nil {
-		return t, nil
-	}
-	if t, err := time.Parse("15-04", v); err == nil {
-		return t, nil
-	}
-	if sec, err := strconv.ParseInt(v, 10, 64); err == nil {
-		return time.Unix(sec, 0), nil
-	}
-	return time.Time{}, fmt.Errorf("unsupported date format: %s", v)
 }
 
 func ViewPictureHandler(config *config.Config) http.HandlerFunc {
