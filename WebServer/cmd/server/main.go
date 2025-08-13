@@ -12,8 +12,3 @@ func main() {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
-
-//TODO:
-/*
---Lepszy restart urzadzenia
-*/

@@ -12,6 +12,7 @@ import (
 	"webserver/internal/services/websocket"
 )
 
+// App wires core components (config, logger, services) and runs the HTTP server.
 type App struct {
 	config           *config.Config
 	logger           *logger.Logger
@@ -21,13 +22,15 @@ type App struct {
 	manager          *services.Manager
 }
 
+// NewApp constructs the application, initializing all services and dependencies.
+// It pre-allocates detector workers according to the configured ProcessingWorkers.
 func NewApp() *App {
 	cfg := config.Load()
 	logger := logger.NewLogger(cfg)
 
 	detectors := make([]*ai.DetectorService, 0, cfg.ProcessingWorkers)
-	for i := 0; i < cfg.ProcessingWorkers; i++ {
-		ds := ai.NewDetectorService(cfg, logger) // załaduj model osobno
+	for i := 0; i < cfg.ProcessingWorkers; i++ { //creating a few detector services to handle image processing asynchronously
+		ds := ai.NewDetectorService(cfg, logger)
 		detectors = append(detectors, ds)
 	}
 	buffer := storage.NewBufferService(cfg, logger)
@@ -45,6 +48,8 @@ func NewApp() *App {
 	}
 }
 
+// Run starts background services, sets up routes and blocks serving HTTP.
+// Returns any error produced by http.ListenAndServe.
 func (a *App) Run() error {
 	// Start background services
 	go a.bufferService.Run()

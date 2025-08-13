@@ -5,19 +5,19 @@ import (
 	"strings"
 )
 
-// AuthMiddleware sprawdza, czy użytkownik jest zalogowany (ma cookie 'authenticated=true')
+// AuthMiddleware validates the presence of an "authenticated" cookie for protected paths.
+// It allows publicPaths without authentication and responds with 401 for API/AJAX
+// requests or redirects to /login for regular requests.
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		// ✅ PUBLICZNE ŚCIEŻKI
-		publicPaths := []string{
+		publicPaths := []string{ //endpoints that do not require authentication
 			"/login",
 			"/auth/login",
 			"/api/camera",
 			"/static/css/login.css",
 		}
 
-		// Sprawdź publiczne ścieżki
 		for _, path := range publicPaths {
 			if strings.HasPrefix(r.URL.Path, path) {
 				next.ServeHTTP(w, r)
@@ -25,16 +25,15 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		// Sprawdź czy użytkownik jest zalogowany
 		cookie, err := r.Cookie("authenticated")
 		if err != nil || cookie.Value != "true" {
-			// Jeśli to zapytanie AJAX/API, zwróć 401
+			// If this is an AJAX/API request, return 401
 			if r.Header.Get("X-Requested-With") == "XMLHttpRequest" ||
 				r.Header.Get("Content-Type") == "application/json" {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
-			// Dla zwykłych żądań przekieruj na login
+			// For regular requests, redirect to login
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}

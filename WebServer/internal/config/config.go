@@ -6,16 +6,19 @@ import (
 	"strconv"
 )
 
+// Config holds application configuration loaded from environment variables
+// or default values when env vars are not present.
 type Config struct {
 	Port              int
 	Password          string
 	ModelPath         string
 	ConfigPath        string
 	ImageDirectory    string
-	ProcessingWorkers int // Liczba worker threads do przetwarzania
+	ProcessingWorkers int
 	LogDirectory      string
 }
 
+// Load reads configuration from environment variables and returns a Config instance.
 func Load() *Config {
 	return &Config{
 		Port:              getEnvAsInt("PORT", 8080),
@@ -28,6 +31,7 @@ func Load() *Config {
 	}
 }
 
+// getEnv returns the environment variable value or a default if empty.
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
@@ -35,6 +39,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
+// getEnvAsInt returns the integer value of an environment variable or a default value.
 func getEnvAsInt(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
 		if intValue, err := strconv.Atoi(value); err == nil {

@@ -56,7 +56,6 @@ class Navbar {
             </div>
         `;
         
-        // Wstaw navbar na początek body
         document.body.insertBefore(navbar, document.body.firstChild);
     }
 
@@ -71,7 +70,6 @@ class Navbar {
     }
 
     addEventListeners() {
-        // Obsługa kliknięć na linki
         document.addEventListener('click', (e) => {
             if (e.target.closest('.navbar-link')) {
                 const link = e.target.closest('.navbar-link');
@@ -81,24 +79,19 @@ class Navbar {
     }
 
     handleNavigation(link) {
-        // Usuń active ze wszystkich linków
         document.querySelectorAll('.navbar-link').forEach(l => l.classList.remove('active'));
-        // Dodaj active do klikniętego
         link.classList.add('active');
         
-        // Zamknij menu mobile
         const menu = document.getElementById('navbar-menu');
         menu.classList.remove('active');
     }
 }
 
-// Funkcja globalna dla przycisku mobile
 function toggleMobileMenu() {
     const menu = document.getElementById('navbar-menu');
     menu.classList.toggle('active');
 }
 
-// Inicjalizacja nawigacji
 document.addEventListener('DOMContentLoaded', () => {
     new Navbar();
 });

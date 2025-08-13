@@ -1,9 +1,8 @@
 let currentPage = 1;
-let pageSize = 24; // corresponds to 'limit' param on backend
+let pageSize = 24; 
 let totalPages = 1;
 
 function buildFilterQuery() {
-    // If filter inputs exist (added on Pictures.html) include them
     const params = new URLSearchParams();
     const camEl = document.getElementById('filterCamera');
     const objEl = document.getElementById('filterObject');
@@ -21,23 +20,6 @@ function buildFilterQuery() {
     return params.toString();
 }
 
-function getParametersFromName(name) {
-    var params = new Map();
-    name = name.replace('.jpg', '');
-    const parts = name.split('_');
-    // Example name: 2025-08-07_13-34_01.681_drzwi_osoba.jpg
-    
-    if (parts.length === 5) {
-        date = parts[0].split('-');
-        date = date[2] + '-' + date[1] + '-' + date[0];
-        params.set('Data', date);
-        parts[1] = parts[1].replace('-', ':');
-        params.set('Godzina', parts[1]);
-        params.set('Kamera', parts[3]);
-        params.set('Obiekt', parts[4]);
-    }
-    return params;
-}
 
 async function loadPictures(page = 1) {
     currentPage = page;
@@ -82,18 +64,16 @@ function displayPictures(data) {
     data.pictures.forEach(picture => {
         const card = document.createElement('div');
         card.className = 'photo-card';
-        const params = getParametersFromName(picture);
-        
         card.innerHTML = `
-            <img src="${data.imagesDir}/${picture}" 
-                    alt="${picture}"
-                    onclick="openPicture('${picture}')"
+            <img src="${data.imagesDir}/${picture.name}" 
+                    alt="${picture.name}"
+                    onclick="openPicture('${picture.name}')"
                     onerror="this.style.display='none'">
             <div class="photo-info">
-                <div>Data: ${params.get('Data')}</div>
-                <div>Godzina: ${params.get('Godzina')}</div>
-                <div>Kamera: ${params.get('Kamera')}</div>
-                <div>Obiekt: ${params.get('Obiekt')}</div>
+                <div>Data: ${picture.date}</div>
+                <div>Godzina: ${picture.timeOfDay}</div>
+                <div>Kamera: ${picture.camera}</div>
+                <div>Obiekt: ${picture.object}</div>
             </div>
         `;
         
@@ -107,14 +87,12 @@ function displayPagination(data) {
     
     if (data.totalPages <= 1) return;
     
-    // Poprzednia
     const prevBtn = document.createElement('button');
     prevBtn.textContent = '←';
     prevBtn.disabled = data.currentPage <= 1;
     prevBtn.onclick = () => loadPictures(data.currentPage - 1);
     pagination.appendChild(prevBtn);
     
-    // Numery stron
     const start = Math.max(1, data.currentPage - 2);
     const end = Math.min(data.totalPages, data.currentPage + 2);
     
@@ -126,7 +104,6 @@ function displayPagination(data) {
         pagination.appendChild(btn);
     }
     
-    // Następna
     const nextBtn = document.createElement('button');
     nextBtn.textContent = '→';
     nextBtn.disabled = data.currentPage >= data.totalPages;
@@ -218,7 +195,6 @@ document.getElementById('clearAllPictures').addEventListener('click', async ()=>
             try {
                 const res = await fetch('/api/pictures/clear', { method: 'POST' });
                 if (!res.ok) throw new Error('Błąd czyszczenia: ' + res.status);
-                // Odśwież listę
                 loadPictures(1);
             } catch(e) {
                 alert(e.message);

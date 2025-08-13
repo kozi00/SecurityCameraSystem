@@ -9,11 +9,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Upgrader upgrades HTTP connections to WebSocket; CheckOrigin allows all origins.
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-// Handler dla kamer z zależnościami
+// CameraWebsocketHandler handles camera connections over WebSocket.
+// Binary messages are treated as JPEG frames and forwarded to the Manager.
+// Text messages are logged for diagnostics.
 func CameraWebsocketHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		camera := r.URL.Query().Get("id")
@@ -23,9 +26,9 @@ func CameraWebsocketHandler(manager *services.Manager, logger *logger.Logger) ht
 			logger.Error("WebSocket upgrade error: %v", err)
 			return
 		}
-
-		connection.SetPingHandler(func(appData string) error {
-			err := connection.SetReadDeadline(time.Now().Add(15 * time.Second))
+		connection.SetReadLimit(1024 * 1024)                   //Setting read limit to 1 MB
+		connection.SetPingHandler(func(appData string) error { //Setting time limit for response in case connection is dead
+			err := connection.SetReadDeadline(time.Now().Add(30 * time.Second))
 			if err != nil {
 				logger.Error("Error setting read deadline: %v", err)
 			}
@@ -54,7 +57,8 @@ func CameraWebsocketHandler(manager *services.Manager, logger *logger.Logger) ht
 	}
 }
 
-// Handler dla viewerów z zależnościami
+// ViewWebsocketHandler handles viewer connections over WebSocket and
+// registers them in the HubService to receive broadcast frames.
 func ViewWebsocketHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		connection, err := Upgrader.Upgrade(w, r, nil)
@@ -71,7 +75,11 @@ func ViewWebsocketHandler(manager *services.Manager, logger *logger.Logger) http
 		for {
 			_, _, err := connection.ReadMessage()
 			if err != nil {
-				logger.Warning("Viewer disconnected: %v", err)
+				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+					logger.Info("Viewer disconnected normally")
+				} else {
+					logger.Error("Viewer disconnected with error: %v", err)
+				}
 				break
 			}
 		}

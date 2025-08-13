@@ -1,4 +1,4 @@
-\#include "esp_camera.h"
+#include "esp_camera.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WebSocketsClient.h>
@@ -7,7 +7,7 @@
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
-const char* serverIp = "192.168.1.101"; // IP serwera
+const char* serverIp = "192.168.1.33"; // IP serwera
 const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 8080;
 //const char* endpoint = "/api/camera?id=balkon";
@@ -171,22 +171,28 @@ void CheckWifiConnection(){
 void SendImage(){
   // Wysyłanie zdjęcia co 'timerDelay' ms
   if (millis() - lastTime > timerDelay) {
-    camera_fb_t *fb = esp_camera_fb_get();
-    if (fb) {
-      if (WiFi.status() == WL_CONNECTED && webSocket.isConnected()) {
-        bool success = webSocket.sendBIN(fb->buf, fb->len);
-        if (!success) {
-          Serial.println("Failed to send image");
-        }
-      } else {
-        Serial.println("WiFi or WebSocket not connected");
-      }
-      esp_camera_fb_return(fb);
-    } else {
-      Serial.println("Failed to capture image");
+    if (WiFi.status() != WL_CONNECTED){
+      Serial.println("WiFi not connected");
+      return
     }
+    if(!webSocket.isConnected()){
+      Serial.println("Websocket not connected");
+      return
+    }
+
+    camera_fb_t *fb = esp_camera_fb_get();
+    if (!fb) {
+      Serial.println("Failed to capture image");
+      return;
+    }
+    bool success = webSocket.sendBIN(fb->buf, fb->len);
+    if (!success) {
+      Serial.println("Failed to send image");
+    }
+    esp_camera_fb_return(fb);
     lastTime = millis();
   }
+    
 }
 
 void loop() {

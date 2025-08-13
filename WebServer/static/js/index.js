@@ -57,7 +57,6 @@ class CameraMonitor {
         console.log("Połączenie WebSocket zamknięte");
         this.updateConnectionStatus(false);
         
-        // Oznacz wszystkie kamery jako offline
         Object.keys(this.cameraStatus).forEach(camera => {
             this.updateCameraStatus(camera, false);
         });
@@ -96,7 +95,6 @@ class CameraMonitor {
             };
             img.src = src;
             
-            // Aktualizuj aktywność kamery
             this.cameraActivity[camera] = Date.now();
             this.updateCameraStatus(camera, true);
         }
@@ -105,7 +103,7 @@ class CameraMonitor {
         setInterval(() => {
             const now = Date.now();
             Object.keys(this.cameraActivity).forEach(camera => {
-                const isActive = (now - this.cameraActivity[camera]) < 10000; // 10 sekund timeout
+                const isActive = (now - this.cameraActivity[camera]) < 10000; 
                 this.updateCameraStatus(camera, isActive);
             });
         }, 5000);

@@ -11,40 +11,39 @@ import (
 	"webserver/internal/services"
 )
 
+// dynamicHTMLHandler serves /path as /static/path.html if the file exists; otherwise 404.
 func dynamicHTMLHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	// jeśli root "/", to zmapuj na "index.html"
 	if path == "/" {
 		path = "/index"
 	}
 
-	// Dodaj .html
 	filePath := filepath.Join("static", path+".html")
 
-	// Sprawdź, czy plik istnieje
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		http.NotFound(w, r)
 		return
 	}
 
-	// Serwuj plik
 	http.ServeFile(w, r, filePath)
 }
 
+// SetupRoutes registers HTTP routes, static file serving, API endpoints,
+// and wraps the mux with the authentication middleware.
 func SetupRoutes(manager *services.Manager, cfg *config.Config, logger *logger.Logger) http.Handler {
 	mux := http.NewServeMux()
 
 	// Static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// API endpoints - używaj Manager bezpośrednio
+	// API endpoints
 	mux.HandleFunc("/api/view", handlers.ViewWebsocketHandler(manager, logger))
 	mux.HandleFunc("/api/camera", handlers.CameraWebsocketHandler(manager, logger))
 	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler(cfg, logger))
 	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler(cfg))
 	mux.HandleFunc("/api/pictures/clear", handlers.ClearPicturesHandler(cfg, logger))
-
+	// Log endpoints
 	mux.HandleFunc("/logs/info", handlers.ShowInfoLogsHandler(cfg))
 	mux.HandleFunc("/logs/warning", handlers.ShowWarningLogsHandler(cfg))
 	mux.HandleFunc("/logs/error", handlers.ShowErrorLogsHandler(cfg))
@@ -54,10 +53,10 @@ func SetupRoutes(manager *services.Manager, cfg *config.Config, logger *logger.L
 	mux.HandleFunc("/logs/error/clear", handlers.ClearErrorLogsHandler(logger))
 
 	// Auth endpoints
-	mux.HandleFunc("/auth/login", handlers.LoginHandler)
+	mux.HandleFunc("/auth/login", handlers.LoginHandler(cfg, logger))
 	mux.HandleFunc("/auth/logout", handlers.LogoutHandler)
 
-	// Dynamic HTML handler
+	// Automatic HTML handler mapping for example: /settings -> /static/settings.html
 	mux.HandleFunc("/", dynamicHTMLHandler)
 
 	// Apply middleware

@@ -13,11 +13,12 @@ import (
 )
 
 const (
-	MotionThreshold    = 10000 // Default threshold for motion detection
-	DetectionThreshold = 0.5   // Default threshold for object detection confidence
+	// MotionThreshold is the default pixel threshold for motion detection.
+	MotionThreshold = 5000
+	// DetectionThreshold is the minimum confidence for object detections.
+	DetectionThreshold = 0.5
 )
 
-// DetectionResult reprezentuje wynik detekcji obiektu
 type DetectionResult struct {
 	Label      string
 	Confidence float64
@@ -27,24 +28,24 @@ type DetectionResult struct {
 	Height     int
 }
 
-// CameraState przechowuje stan detekcji ruchu dla każdej kamery, aby porównać klatki
+// CameraState holds motion detection state for a single camera.
 type CameraState struct {
 	previousMat gocv.Mat
 	hasPrevious bool
 	mutex       sync.Mutex
 }
 
-// DetectorService serwis do rozpoznawania obiektów
 type DetectorService struct {
-	cameraStates map[string]*CameraState // State dla każdej kamery osobno
-	statesMutex  sync.RWMutex            // Mutex do mapy states
+	cameraStates map[string]*CameraState
+	statesMutex  sync.RWMutex
 	net          gocv.Net
 	modelPath    string
 	configPath   string
 	logger       *logger.Logger
 }
 
-// NewService tworzy nowy serwis detekcji
+// NewDetectorService creates a detector with model/config paths and a logger.
+// It attempts to initialize the underlying DNN network.
 func NewDetectorService(config *config.Config, logger *logger.Logger) *DetectorService {
 	service := &DetectorService{
 		cameraStates: make(map[string]*CameraState),
@@ -61,7 +62,7 @@ func NewDetectorService(config *config.Config, logger *logger.Logger) *DetectorS
 	return service
 }
 
-// initializeNet inicjalizuje sieć detekcji z plików modelu i konfiguracji
+// initializeNet loads the DNN network and sets backend/target preferences.
 func (s *DetectorService) initializeNet() error {
 	if _, err := os.Stat(s.modelPath); os.IsNotExist(err) {
 		return fmt.Errorf("model file not found: %s", s.modelPath)
@@ -88,34 +89,7 @@ func (s *DetectorService) initializeNet() error {
 	return nil
 }
 
-func (s *DetectorService) getCameraState(cameraID string) *CameraState {
-	s.statesMutex.RLock()
-	state, exists := s.cameraStates[cameraID]
-	s.statesMutex.RUnlock()
-
-	if exists {
-		return state
-	}
-
-	// Tworzymy nowy state
-	s.statesMutex.Lock()
-	defer s.statesMutex.Unlock()
-
-	// Double-check (może zostać utworzony przez inny wątek)
-	if state, exists := s.cameraStates[cameraID]; exists {
-		return state
-	}
-
-	state = &CameraState{
-		hasPrevious: false,
-	}
-	s.cameraStates[cameraID] = state
-	s.logger.Info("Created motion detection state for camera: %s", cameraID)
-
-	return state
-}
-
-// DetectMotion wykrywa ruch między klatkami
+// DetectMotion computes frame differences to detect movement above MotionThreshold.
 func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool, error) {
 	// Convert bytes to Mat
 	state := s.getCameraState(cameraID)
@@ -178,27 +152,26 @@ func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool
 	return motionDetected, nil
 }
 
+// DetectObjects runs the DNN on the image and returns array of structured DetectionResults that were above the confidence threshold.
 func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, error) {
 	if s.net.Empty() {
 		return []DetectionResult{}, fmt.Errorf("detection network not initialized")
 	}
 
-	// Dekoduj obraz
+	//Convert image to mat
 	mat, err := gocv.IMDecode(imageBytes, gocv.IMReadColor)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode image: %v", err)
 	}
 	defer mat.Close()
 
-	// Sprawdź czy obraz nie jest pusty
 	if mat.Empty() {
 		return nil, fmt.Errorf("decoded image is empty")
 	}
-
+	//Create blob with parameters that fit ssd coco net input
 	blob := gocv.BlobFromImage(mat, 1.0/127.5, image.Pt(300, 300), gocv.NewScalar(127.5, 127.5, 127.5, 0), true, false)
 	defer blob.Close()
 
-	// Ustaw input dla sieci
 	s.net.SetInput(blob, "")
 
 	output := s.net.Forward("")
@@ -206,7 +179,7 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 
 	var results []DetectionResult
 
-	// Process detections
+	// Process detections with output: [ batch_id, class_id, confidence, x1, y1, x2, y2 ]
 	outputReshaped := output.Reshape(1, output.Total()/7)
 	for i := 0; i < outputReshaped.Rows(); i++ {
 		confidence := outputReshaped.GetFloatAt(i, 2)
@@ -232,7 +205,7 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 	return results, nil
 }
 
-// DrawRectangle rysuje prostokąty na obrazie
+// DrawRectangle draws detection results on the image and returns a re-encoded JPEG buffer.
 func (s *DetectorService) DrawRectangle(detections []DetectionResult, img []byte) ([]byte, error) {
 	red := color.RGBA{R: 255, G: 0, B: 0, A: 0}
 
@@ -249,7 +222,6 @@ func (s *DetectorService) DrawRectangle(detections []DetectionResult, img []byte
 			return nil, fmt.Errorf("failed to draw rectangle: %v", err)
 		}
 
-		// Opcjonalnie: dodaj etykietę klasy
 		label := fmt.Sprintf("%s (%.2f)", detection.Label, detection.Confidence)
 		pt := image.Pt(detection.X, detection.Y-5)
 		err = gocv.PutText(&mat, label, pt, gocv.FontHersheySimplex, 0.5, red, 1)
@@ -270,15 +242,16 @@ func (s *DetectorService) DrawRectangle(detections []DetectionResult, img []byte
 	return finalImage, nil
 }
 
+// getClassLabel maps model class IDs to human-readable labels.
 func getClassLabel(classID int) string {
 	labels := map[int]string{
 		1:  "osoba",
 		2:  "rower",
-		3:  "samochód",
+		3:  "samochod",
 		4:  "motocykl",
 		5:  "samolot",
 		6:  "autobus",
-		8:  "ciężarówka",
+		8:  "ciezarowka",
 		16: "ptak",
 		17: "kot",
 		18: "pies",
@@ -288,4 +261,30 @@ func getClassLabel(classID int) string {
 		return label
 	}
 	return fmt.Sprintf("nieznany_%d", classID)
+}
+
+// getCameraState returns the per-camera state, creating it when absent.
+func (s *DetectorService) getCameraState(cameraID string) *CameraState {
+	s.statesMutex.RLock()
+	state, exists := s.cameraStates[cameraID]
+	s.statesMutex.RUnlock()
+
+	if exists {
+		return state
+	}
+
+	s.statesMutex.Lock()
+	defer s.statesMutex.Unlock()
+	// Double-check (may have been created by another thread)
+	if state, exists := s.cameraStates[cameraID]; exists {
+		return state
+	}
+
+	state = &CameraState{
+		hasPrevious: false,
+	}
+	s.cameraStates[cameraID] = state
+	s.logger.Info("Created motion detection state for camera: %s", cameraID)
+
+	return state
 }

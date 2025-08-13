@@ -11,7 +11,9 @@ import (
 )
 
 const (
-	ImageBufferLimit         = 7
+	// ImageBufferLimit limits how many images per camera are buffered before flushing.
+	ImageBufferLimit = 7
+	// ImageBufferFlushInterval defines how often (seconds) buffered images are flushed to disk.
 	ImageBufferFlushInterval = 30
 )
 
@@ -22,14 +24,16 @@ type Image struct {
 	Data      []byte
 }
 
+// BufferService buffers images in memory and periodically flushes them to disk.
 type BufferService struct {
 	imagesDir   string
 	images      []Image
-	bufferCount map[string]int // Limit for each camera
+	bufferCount map[string]int
 	mu          sync.Mutex
 	logger      *logger.Logger
 }
 
+// NewBufferService creates a new BufferService with the target directory and logger.
 func NewBufferService(config *config.Config, logger *logger.Logger) *BufferService {
 	return &BufferService{
 		imagesDir:   config.ImageDirectory,
@@ -40,6 +44,7 @@ func NewBufferService(config *config.Config, logger *logger.Logger) *BufferServi
 	}
 }
 
+// Run starts a ticker loop that periodically flushes images to disk.
 func (s *BufferService) Run() {
 	ticker := time.NewTicker(time.Duration(ImageBufferFlushInterval) * time.Second)
 
@@ -50,6 +55,7 @@ func (s *BufferService) Run() {
 	}
 }
 
+// AddImage appends an image to the in-memory buffer for a given camera.
 func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -69,6 +75,7 @@ func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 	}
 }
 
+// FlushImages writes buffered images to disk and resets the buffer and per-camera counters.
 func (s *BufferService) FlushImages() {
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -2,12 +2,10 @@
         let autoRefresh = false;
         let refreshInterval;
 
-        // ✅ LOAD LOGS
         async function loadLogs(type) {
             currentLogType = type;
             const logContent = document.getElementById('log-content');
             
-            // Show loading
             logContent.textContent = '🔄 Ładowanie logów...';
             
             try {
@@ -24,7 +22,6 @@
             }
         }
 
-        // ✅ CLEAR LOGS
         async function clearLogs(type) {
             const confirmed = confirm(`🗑️ Czy na pewno chcesz wyczyścić logi typu "${type}"?`);
             if (!confirmed) return;
@@ -37,7 +34,6 @@
                 if (response.ok) {
                     alert(`✅ Logi typu "${type}" zostały wyczyszczone!`);
                     
-                    // Jeśli obecnie wyświetlamy te logi, odśwież
                     if (currentLogType === type) {
                         loadLogs(type);
                     }
