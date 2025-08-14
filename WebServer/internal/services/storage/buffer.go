@@ -12,7 +12,7 @@ import (
 
 const (
 	// ImageBufferLimit limits how many images per camera are buffered before flushing.
-	ImageBufferLimit = 7
+	ImageBufferLimit = 15
 	// ImageBufferFlushInterval defines how often (seconds) buffered images are flushed to disk.
 	ImageBufferFlushInterval = 30
 )

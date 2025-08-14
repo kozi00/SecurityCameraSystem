@@ -14,7 +14,7 @@ import (
 
 const (
 	// MotionThreshold is the default pixel threshold for motion detection.
-	MotionThreshold = 5000
+	MotionThreshold = 7000
 	// DetectionThreshold is the minimum confidence for object detections.
 	DetectionThreshold = 0.5
 )
@@ -152,7 +152,7 @@ func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool
 	return motionDetected, nil
 }
 
-// DetectObjects runs the DNN on the image and returns array of structured DetectionResults that were above the confidence threshold.
+// DetectObjects runs the DNN on the image and returns array of DetectionResults that were above the confidence threshold.
 func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, error) {
 	if s.net.Empty() {
 		return []DetectionResult{}, fmt.Errorf("detection network not initialized")

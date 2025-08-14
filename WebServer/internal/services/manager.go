@@ -13,9 +13,7 @@ import (
 
 const (
 	// ProcessingQueueSize is the capacity of the image processing channel.
-	ProcessingQueueSize = 100
-	// ProcessingInterval controls sampling rate (1=every frame, 2=every other frame, etc.).
-	ProcessingInterval = 2
+	ProcessingQueueSize = 50
 	// MotionDetectionWorkerId selects which worker performs motion detection for gating.
 	MotionDetectionWorkerId = 0
 )
@@ -58,7 +56,7 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 		go manager.processingWorker(i)
 	}
 
-	manager.logger.Info("🎬 Manager started - processing every %d frame(s)", ProcessingInterval)
+	manager.logger.Info("🎬 Manager started")
 	return manager
 }
 
@@ -67,10 +65,6 @@ func NewManager(detectorServices []*ai.DetectorService, bufferService *storage.B
 func (m *Manager) HandleCameraImage(image []byte, camera string) {
 	if m.websocketService.GetClientCount() > 0 {
 		m.sendToViewers(image, camera)
-	}
-
-	if !m.shouldProcessFrame(camera) {
-		return
 	}
 
 	motionDetected, err := m.detectorServices[MotionDetectionWorkerId].DetectMotion(image, camera)
@@ -111,19 +105,6 @@ func (m *Manager) Stop() {
 	close(m.processingQueue)
 	m.wg.Wait()
 	m.logger.Info("🛑 All processing workers stopped")
-}
-
-// shouldProcessFrame applies per-camera rate limiting based on ProcessingInterval.
-func (m *Manager) shouldProcessFrame(camera string) bool {
-	m.frameCounterMu.Lock()
-	defer m.frameCounterMu.Unlock()
-
-	m.frameCounters[camera]++
-	if m.frameCounters[camera]%ProcessingInterval != 0 {
-		return false
-	}
-	m.frameCounters[camera] = 0
-	return true
 }
 
 // sendToViewers encodes the frame as base64 within a small JSON and broadcasts it.

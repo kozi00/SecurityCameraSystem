@@ -8,32 +8,16 @@ const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
 const char* serverIp = "192.168.1.33"; // IP serwera
-const char* endpoint = "/api/camera?id=drzwi";
+//const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 8080;
-//const char* endpoint = "/api/camera?id=balkon";
+const char* endpoint = "/api/camera?id=brama";
 
 WebSocketsClient webSocket;
 
 #define CAMERA_MODEL_AI_THINKER
 
 #if defined(CAMERA_MODEL_AI_THINKER)
-#define PWDN_GPIO_NUM     32
-#define RESET_GPIO_NUM    -1
-#define XCLK_GPIO_NUM      0
-#define SIOD_GPIO_NUM     26
-#define SIOC_GPIO_NUM     27
-#define Y9_GPIO_NUM       35
-#define Y8_GPIO_NUM       34
-#define Y7_GPIO_NUM       39
-#define Y6_GPIO_NUM       36
-#define Y5_GPIO_NUM       21
-#define Y4_GPIO_NUM       19
-#define Y3_GPIO_NUM       18
-#define Y2_GPIO_NUM        5
-#define VSYNC_GPIO_NUM    25
-#define HREF_GPIO_NUM     23
-#define PCLK_GPIO_NUM     22
-
+#define LED_FLASH 4  
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM      0
@@ -72,6 +56,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         case WStype_BIN:
         case WStype_ERROR:		
             Serial.println("Error\n");	
+            break;
         case WStype_FRAGMENT_TEXT_START:
         case WStype_FRAGMENT_BIN_START:
         case WStype_FRAGMENT:
@@ -113,13 +98,17 @@ void setup() {
 
   // rozdzielczość i jakość
   config.frame_size = FRAMESIZE_VGA; // FRAMESIZE_SVGA, UXGA, QVGA, ...
-  config.jpeg_quality = 6;           // 0-63 (niższa = lepsza jakość)
+  config.jpeg_quality = 8;           // 0-63 (niższa = lepsza jakość)
   config.fb_count = 1;
+
+  pinMode(LED_FLASH, OUTPUT);  
+
 
   // Inicjalizacja kamery
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Błąd inicjalizacji kamery: 0x%x", err);
+    digitalWrite(LED_FLASH, HIGH);
     return;
   }
 
@@ -142,7 +131,7 @@ void setup() {
   webSocket.enableHeartbeat(10000, 3000, 2);
 }
 
-const unsigned long timerDelay = 250;
+const unsigned long timerDelay = 500;
 const unsigned long timerWifi = 1000;
 const unsigned long maxWifiAttempts = 30;
 
@@ -173,11 +162,11 @@ void SendImage(){
   if (millis() - lastTime > timerDelay) {
     if (WiFi.status() != WL_CONNECTED){
       Serial.println("WiFi not connected");
-      return
+      return;
     }
     if(!webSocket.isConnected()){
       Serial.println("Websocket not connected");
-      return
+      return;
     }
 
     camera_fb_t *fb = esp_camera_fb_get();

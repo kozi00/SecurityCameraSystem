@@ -3,11 +3,11 @@ class CameraMonitor {
         this.socket = null;
         this.connectionBadge = document.getElementById('connection-badge');
         this.cameraStatus = {
-            balkon: document.getElementById('status_balkon'),
+            brama: document.getElementById('status_brama'),
             drzwi: document.getElementById('status_drzwi')
         };
         this.cameraActivity = {
-            balkon: Date.now(),
+            brama: Date.now(),
             drzwi: Date.now()
         };
         

@@ -1,2 +1,16 @@
 ℹ️  INFO    2025/08/13 13:45:35 logger.go:62: File content has been cleared.
 ℹ️  INFO    2025/08/13 13:45:42 logger.go:62: File content has been cleared.
+ℹ️  INFO    2025/08/14 16:09:15 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/08/14 16:09:24 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/08/14 16:09:32 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🔑 Password: sienkiewicza2
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 📁 Images: ./static/images
+ℹ️  INFO    2025/08/14 16:09:39 logger.go:67: 🤖 AI Model: ./internal/services/ai/frozen_inference_graph.pb
