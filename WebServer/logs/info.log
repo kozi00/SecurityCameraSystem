@@ -28,3 +28,164 @@
 ℹ️  INFO    2025/09/04 14:34:08 logger.go:67: 🔑 Password: henryk2
 ℹ️  INFO    2025/09/04 14:34:08 logger.go:67: 📁 Images: static\images
 ℹ️  INFO    2025/09/04 14:34:08 logger.go:67: 🤖 AI Model: internal\services\ai\frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 📍 URL: http://localhost:80
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 14:45:02 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 15:46:57 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 15:48:34 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:19:41 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:21:28 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:25:12 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:28:20 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:36:04 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:39:22 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:41:12 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: Detection network initialized successfully
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🎬 Manager started
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🔧 Processing worker 1 started
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🔧 Processing worker 0 started
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🔧 Processing worker 2 started
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🔧 Processing worker 3 started
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🚀 Security Camera Server
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 📍 URL: http://localhost:8080
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🔑 Password: henryk2
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 📁 Images: /app/static/images
+ℹ️  INFO    2025/11/08 16:43:23 logger.go:67: 🤖 AI Model: /app/internal/services/ai/frozen_inference_graph.pb
+ℹ️  INFO    2025/11/08 16:43:26 logger.go:67: Viewer connected
+ℹ️  INFO    2025/11/08 16:43:26 logger.go:67: Client connected. Total: 1
+ℹ️  INFO    2025/11/08 16:43:29 logger.go:67: Viewer disconnected normally
+ℹ️  INFO    2025/11/08 16:43:29 logger.go:67: Client disconnected. Total: 0
+ℹ️  INFO    2025/11/08 16:43:32 logger.go:67: Viewer connected
+ℹ️  INFO    2025/11/08 16:43:32 logger.go:67: Client connected. Total: 1
+ℹ️  INFO    2025/11/08 17:00:38 logger.go:67: Client disconnected. Total: 0

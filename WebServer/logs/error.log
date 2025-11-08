@@ -1,0 +1,1 @@
+❌ ERROR   2025/11/08 17:00:38 logger.go:81: Viewer disconnected with error: websocket: close 1006 (abnormal closure): unexpected EOF

@@ -21,7 +21,7 @@ type Config struct {
 // Load reads configuration from environment variables and returns a Config instance.
 func Load() *Config {
 	return &Config{
-		Port:              getEnvAsInt("PORT", 80),
+		Port:              getEnvAsInt("PORT", 8080),
 		Password:          getEnv("PASSWORD", ""),
 		ModelPath:         getEnv("MODEL_PATH", filepath.Join(".", "internal", "services", "ai", "frozen_inference_graph.pb")),
 		ConfigPath:        getEnv("CONFIG_PATH", filepath.Join(".", "internal", "services", "ai", "ssd_mobilenet_v1_coco_2017_11_17.pbtxt")),
