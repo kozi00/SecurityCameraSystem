@@ -1,7 +1,13 @@
 #include "esp_camera.h"
+#include "time.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WebSocketsClient.h>
+
+//dane do pobierania godziny
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 3600;       // Polska: +1h
+const int   daylightOffset_sec = 3600;  // czas letni
 
 //dane wifi
 const char* ssid = "Orange_Swiatlowod_3060";
@@ -13,6 +19,7 @@ uint16_t port = 80;
 //const char* endpoint = "/api/camera?id=brama";
 
 WebSocketsClient webSocket;
+sensor_t * sensor;
 
 #define CAMERA_MODEL_AI_THINKER
 
@@ -129,15 +136,22 @@ void setup() {
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(5000);
   webSocket.enableHeartbeat(10000, 3000, 2);
+
+  sensor = esp_camera_sensor_get();
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
-const unsigned long timerDelay = 500;
-const unsigned long timerWifi = 1000;
-const unsigned long maxWifiAttempts = 30;
+const unsigned long timerSend = 500; // co ile milisekund generowac i wysylac obraz
+const unsigned long timerWifi = 1000; // co ile milisekund sprawdzac czy urzadzenie jest polaczone z wifi
+const unsigned long timerNight = 60000; // co ile milisekund sprawdzac czy przelaczyc urzadzenie na tryb nocny
 
-unsigned long lastTime = 0;
+unsigned long lastNightCheck = 0;
+unsigned long lastImageSend = 0;
 unsigned long lastWiFiCheck = 0;
+
+const unsigned long maxWifiAttempts = 30;
 unsigned int noWifiCounter = 0;
+
 
 void CheckWifiConnection(){
   if (millis() - lastWiFiCheck > timerWifi) {
@@ -159,7 +173,7 @@ void CheckWifiConnection(){
 }
 void SendImage(){
   // Wysyłanie zdjęcia co 'timerDelay' ms
-  if (millis() - lastTime > timerDelay) {
+  if (millis() - lastImageSend > timerSend) {
     if (WiFi.status() != WL_CONNECTED){
       Serial.println("WiFi not connected");
       return;
@@ -179,12 +193,42 @@ void SendImage(){
       Serial.println("Failed to send image");
     }
     esp_camera_fb_return(fb);
-    lastTime = millis();
+    lastImageSend = millis();
   }
-    
 }
+bool currentMode = "day";
+'''
+void SetMode(){
+  //TODO: dynamic night mode not based on time
+  //TODO: solve issue with noise in night mode
+  
+  if(millis() - lastNightCheck > timerNight){
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+      Serial.println("Nie udalo sie pobrac czasu");
+      return;
+    }
 
+    if (timeinfo.tm_hour >= 17 || timeinfo.tm_hour < 6) { 
+      sensor->set_gainceiling(sensor, GAINCEILING_64X);  
+      mode = "night";
+    } else {
+      sensor->set_gainceiling(sensor, GAINCEILING_2X);   
+      mode = "day";
+    }
+    if(currentMode != mode){
+        currentMode = mode;
+          String metadata = "{\"camera\":\"" + String(cameraId) + 
+                          "\",\"mode\":\"" + String(mode) + 
+                          "\",\"timestamp\":" + String(millis()) + "}";
+        webSocket.sendTXT(metadata);
+    }
+    lastNightCheck = millis();
+  }
+}
+'''
 void loop() {
+  //SetMode();
   webSocket.loop();  
   SendImage();
   CheckWifiConnection();

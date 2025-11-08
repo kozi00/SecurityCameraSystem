@@ -19,7 +19,7 @@ var Upgrader = websocket.Upgrader{
 // Text messages are logged for diagnostics.
 func CameraWebsocketHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		camera := r.URL.Query().Get("id")
+		camera := r.URL.Query().Get("id") // camera identifier specified in arduino
 
 		connection, err := Upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -47,6 +47,7 @@ func CameraWebsocketHandler(manager *services.Manager, logger *logger.Logger) ht
 
 			switch messageType {
 			case websocket.TextMessage:
+				//TODO: process mode changing
 				logger.Info("Camera %s sent text message: %s", camera, msg)
 			case websocket.BinaryMessage:
 				manager.HandleCameraImage(msg, camera)
