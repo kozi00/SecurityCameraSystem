@@ -73,7 +73,7 @@ function displayPictures(data) {
                 <div>Data: ${picture.date}</div>
                 <div>Godzina: ${picture.timeOfDay}</div>
                 <div>Kamera: ${picture.camera}</div>
-                <div>Obiekt: ${picture.object}</div>
+                <div>Obiekt: ${picture.objects.join(", ")}</div>
             </div>
         `;
         

@@ -14,7 +14,7 @@ import (
 
 const (
 	// MotionThreshold is the default pixel threshold for motion detection.
-	MotionThreshold = 7000
+	MotionThreshold = 500
 	// DetectionThreshold is the minimum confidence for object detections.
 	DetectionThreshold = 0.5
 )
@@ -198,7 +198,9 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 				Width:      width,
 				Height:     height,
 			})
-			s.logger.Info("Detected %s", results[len(results)-1].Label)
+			for _, object := range results {
+				s.logger.Info("Detected %s", object.Label)
+			}
 		}
 	}
 
@@ -260,7 +262,7 @@ func getClassLabel(classID int) string {
 	if label, exists := labels[classID]; exists {
 		return label
 	}
-	return fmt.Sprintf("nieznany_%d", classID)
+	return fmt.Sprintf("nieznany%d", classID)
 }
 
 // getCameraState returns the per-camera state, creating it when absent.

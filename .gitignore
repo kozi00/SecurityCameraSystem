@@ -11,7 +11,8 @@ bin/
 # OS/editor noise
 .DS_Store
 Thumbs.db
-.vscode/WebServer/static/images
+WebServer/static/images/*
+
 WebServer/.vscode/
 WebServer/logs/error.log
 WebServer/logs/warning.log

@@ -13,13 +13,14 @@ const int   daylightOffset_sec = 3600;  // czas letni
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
-const char* serverIp = "192.168.1.33"; // IP serwera
-const char* endpoint = "/api/camera?id=drzwi";
+const char* serverIp = "192.168.1.42"; // IP serwera
+//const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 80;
-//const char* endpoint = "/api/camera?id=brama";
+const char* endpoint = "/api/camera?id=brama";
 
 WebSocketsClient webSocket;
 sensor_t * sensor;
+
 
 #define CAMERA_MODEL_AI_THINKER
 
@@ -110,6 +111,8 @@ void setup() {
 
   pinMode(LED_FLASH, OUTPUT);  
 
+  //s->set_vflip(s, 1); //odwrocenie kamery
+
 
   // Inicjalizacja kamery
   esp_err_t err = esp_camera_init(&config);
@@ -184,6 +187,7 @@ void SendImage(){
     }
 
     camera_fb_t *fb = esp_camera_fb_get();
+    f
     if (!fb) {
       Serial.println("Failed to capture image");
       return;
@@ -196,8 +200,9 @@ void SendImage(){
     lastImageSend = millis();
   }
 }
-bool currentMode = "day";
-'''
+/*
+char* currentMode = "day";
+
 void SetMode(){
   //TODO: dynamic night mode not based on time
   //TODO: solve issue with noise in night mode
@@ -226,7 +231,7 @@ void SetMode(){
     lastNightCheck = millis();
   }
 }
-'''
+*/
 void loop() {
   //SetMode();
   webSocket.loop();  

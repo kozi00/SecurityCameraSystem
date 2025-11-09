@@ -20,7 +20,7 @@ const (
 type Image struct {
 	Timestamp string
 	Camera    string
-	Object    string
+	Objects   []string
 	Data      []byte
 }
 
@@ -56,7 +56,7 @@ func (s *BufferService) Run() {
 }
 
 // AddImage appends an image to the in-memory buffer for a given camera.
-func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
+func (s *BufferService) AddImage(imageData []byte, cameraId string, objects []string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -64,7 +64,7 @@ func (s *BufferService) AddImage(imageData []byte, cameraId, object string) {
 	image := Image{
 		Timestamp: timestamp,
 		Camera:    cameraId,
-		Object:    object,
+		Objects:   objects,
 		Data:      imageData,
 	}
 
@@ -90,7 +90,13 @@ func (s *BufferService) FlushImages() {
 	}
 
 	for _, image := range s.images {
-		filename := fmt.Sprintf("%s_%s_%s.jpg", image.Timestamp, image.Camera, image.Object)
+		objects := ""
+		for _, obj := range image.Objects {
+			objects += obj
+			objects += "_"
+		}
+
+		filename := fmt.Sprintf("%s_%s_%s.jpg", image.Timestamp, image.Camera, objects)
 		fullpath := filepath.Join(s.imagesDir, filename)
 
 		if err := os.WriteFile(fullpath, image.Data, 0644); err != nil {

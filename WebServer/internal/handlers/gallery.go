@@ -25,7 +25,7 @@ type PictureInfo struct {
 	Date      time.Time `json:"date"`
 	TimeOfDay time.Time `json:"timeOfDay"`
 	Camera    string    `json:"camera"`
-	Object    string    `json:"object"`
+	Objects   []string  `json:"objects"` // Multiple detected objects
 }
 
 // MarshalJSON customizes JSON output for PictureInfo to format date and time-of-day.
@@ -201,8 +201,18 @@ func checkMatch(pic PictureInfo, filters PictureFilters) bool {
 	if filters.Camera != "" && !strings.EqualFold(pic.Camera, filters.Camera) {
 		return false
 	}
-	if filters.Object != "" && !strings.EqualFold(pic.Object, filters.Object) {
-		return false
+	if filters.Object != "" {
+		// Check if any of the detected objects matches the filter
+		found := false
+		for _, obj := range pic.Objects {
+			if strings.EqualFold(obj, filters.Object) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
 	}
 	if !filters.DateAfter.IsZero() && pic.Date.Before(filters.DateAfter) {
 		return false
@@ -252,24 +262,27 @@ func parseTimeOfDay(v string) time.Time {
 }
 
 // parsePictureName parses files in the pattern
-// 2006-01-02_15-04_05.000_camera_object.jpg
+// 2006-01-02_15-04_05.000_camera_object1_object2_objectN.jpg
 // The seconds.milliseconds segment is ignored for filtering; date and HH:MM are used.
 func parsePictureName(filename string) (PictureInfo, error) {
 	base := strings.TrimSuffix(filename, filepath.Ext(filename))
 	parts := strings.Split(base, "_")
 
+	// Format: [date, time, seconds.ms, camera, object1, object2, ...]
 	if len(parts) >= 5 {
 		d, err1 := time.Parse("2006-01-02", parts[0])
 		hm, err2 := time.Parse("15-04", parts[1])
 		if err1 == nil && err2 == nil {
-			cam := parts[len(parts)-2]
-			obj := parts[len(parts)-1]
+			camera := parts[3]
+			// All parts from index 4 onwards are detected objects
+			objects := parts[4 : len(parts)-1]
+
 			return PictureInfo{
 				Name:      filename,
 				Date:      d,
 				TimeOfDay: hm,
-				Camera:    cam,
-				Object:    obj,
+				Camera:    camera,
+				Objects:   objects,
 			}, nil
 		}
 	}

@@ -146,6 +146,14 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 			imageWithDetections = image
 		}
 
-		m.bufferService.AddImage(imageWithDetections, camera, detections[0].Label)
+		var detectionsStr []string // Store up to 5 detected object labels
+		for i, det := range detections {
+			if i >= 5 {
+				break
+			}
+			detectionsStr = append(detectionsStr, det.Label)
+		}
+
+		m.bufferService.AddImage(imageWithDetections, camera, detectionsStr)
 	}
 }
