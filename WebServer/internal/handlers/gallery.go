@@ -275,7 +275,7 @@ func parsePictureName(filename string) (PictureInfo, error) {
 		if err1 == nil && err2 == nil {
 			camera := parts[3]
 			// All parts from index 4 onwards are detected objects
-			objects := parts[4 : len(parts)-1]
+			objects := parts[4:]
 
 			return PictureInfo{
 				Name:      filename,

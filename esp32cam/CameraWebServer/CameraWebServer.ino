@@ -13,7 +13,7 @@ const int   daylightOffset_sec = 3600;  // czas letni
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
-const char* serverIp = "192.168.1.42"; // IP serwera
+const char* serverIp = "192.168.1.13"; // IP serwera
 //const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 80;
 const char* endpoint = "/api/camera?id=brama";
@@ -111,7 +111,6 @@ void setup() {
 
   pinMode(LED_FLASH, OUTPUT);  
 
-  //s->set_vflip(s, 1); //odwrocenie kamery
 
 
   // Inicjalizacja kamery
@@ -141,6 +140,8 @@ void setup() {
   webSocket.enableHeartbeat(10000, 3000, 2);
 
   sensor = esp_camera_sensor_get();
+  sensor->set_vflip(sensor, 1); //odwrocenie kamery
+
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
@@ -187,7 +188,6 @@ void SendImage(){
     }
 
     camera_fb_t *fb = esp_camera_fb_get();
-    f
     if (!fb) {
       Serial.println("Failed to capture image");
       return;
