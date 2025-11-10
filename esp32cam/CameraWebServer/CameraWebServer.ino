@@ -14,9 +14,9 @@ const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
 const char* serverIp = "192.168.1.13"; // IP serwera
-//const char* endpoint = "/api/camera?id=drzwi";
+const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 80;
-const char* endpoint = "/api/camera?id=brama";
+//const char* endpoint = "/api/camera?id=brama";
 
 WebSocketsClient webSocket;
 sensor_t * sensor;
@@ -140,7 +140,8 @@ void setup() {
   webSocket.enableHeartbeat(10000, 3000, 2);
 
   sensor = esp_camera_sensor_get();
-  sensor->set_vflip(sensor, 1); //odwrocenie kamery
+  //sensor->set_vflip(sensor, 1); //odwrocenie kamery
+  //sensor->set_hmirror(sensor, 1);
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
