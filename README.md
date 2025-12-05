@@ -2,6 +2,8 @@
 
 Real-time video surveillance system using ESP32-CAM and Go web server.
 
+https://github.com/user-attachments/assets/37ed7cb8-430b-42d5-8277-bd959632e53d
+
 ## 🏗️ Architecture
 
 ```
