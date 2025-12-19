@@ -1,4 +1,4 @@
-# 🔒 Security Camera System
+#  Security Camera System
 
 Real-time video surveillance system using ESP32-CAM and Go web server.
 
@@ -6,7 +6,7 @@ https://github.com/user-attachments/assets/37ed7cb8-430b-42d5-8277-bd959632e53d
 
 ![86aa94ae-e85a-48ce-b732-a09719383f28](https://github.com/user-attachments/assets/a687173f-ba33-4acb-b651-203c552cae4e)
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
@@ -18,7 +18,7 @@ ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
             Save image to disk if motion detected
 ```
 
-## 🧰 Tech Stack
+##  Tech Stack
 - Orange PI RV2 - mini-computer as server
 - ESP32‑CAM (Arduino) – video capture device programming in C
 - Go (1.21+) – net/http, goroutines, mutex
@@ -27,7 +27,7 @@ ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
 - SSD Mobilenet v1 COCO - pre-trained object detection model
 - HTML5/CSS3, vanilla JavaScript – frontend without frameworks
 
-## 🔎 How It Works – Step by Step
+##  How It Works – Step by Step
 
 ### 1) Server Startup
 1. Application starts HTTP server
@@ -67,7 +67,7 @@ ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
 2. Authorization: `/auth/login` (GET/POST) and `/auth/logout`. Most routes are protected by `AuthMiddleware`
 3. Log files are easily accessible from web interface
 
-## 📁 Structure 
+##  Structure 
 
 ```
 esp32cam
@@ -99,7 +99,7 @@ WebServer/
 ```
 
 
-## 🚀 Installation and Setup
+##  Installation and Setup
 
 ### Prerequisites
 - Go 1.21+
@@ -142,7 +142,7 @@ Server will start on `http://localhost:80` (or port specified in `.env`)
 2. Select board "AI Thinker ESP32-CAM" 
 3. Upload code to ESP32-CAM
 
-## 🐳 Docker Setup
+##  Docker Setup
 
 The project includes pre-configured Docker files in `WebServer/` directory:
 - `docker-compose.yml` - Docker Compose configuration
