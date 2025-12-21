@@ -25,7 +25,6 @@ class Navbar {
         
             <div class="navbar-container">
                 <a href="/" class="navbar-logo">
-                    <span class="navbar-icon">🔒</span>
                     <span>System Kamer</span>
                 </a>
                 
@@ -36,19 +35,16 @@ class Navbar {
                 <ul class="navbar-menu" id="navbar-menu">
                     <li class="navbar-item">
                         <a href="/" class="navbar-link" data-page="podglad">
-                            <span class="navbar-icon">👁️</span>
                             <span>Podgląd</span>
                         </a>
                     </li>
                     <li class="navbar-item">
                         <a href="/pictures" class="navbar-link" data-page="zdjecia">
-                            <span class="navbar-icon">📷</span>
                             <span>Zdjęcia</span>
                         </a>
                     </li>
                     <li class="navbar-item">
                         <a href="/logs" class="navbar-link" data-page="dziennik">
-                            <span class="navbar-icon">📝</span>
                             <span>Dziennik zdarzeń</span>
                         </a>
                     </li>

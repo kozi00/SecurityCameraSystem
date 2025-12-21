@@ -4,16 +4,16 @@
 #include <HTTPClient.h>
 #include <WebSocketsClient.h>
 
-//dane do pobierania godziny
+//data for time synchronization
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 3600;       // Polska: +1h
-const int   daylightOffset_sec = 3600;  // czas letni
+const long  gmtOffset_sec = 3600;       // Poland +1 hour
+const int   daylightOffset_sec = 3600;  // daylight saving time
 
-//dane wifi
+//wifi data
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
-const char* serverIp = "192.168.1.13"; // IP serwera
+const char* serverIp = "192.168.1.13"; // server IP
 const char* endpoint = "/api/camera?id=drzwi";
 uint16_t port = 80;
 //const char* endpoint = "/api/camera?id=brama";
@@ -104,16 +104,16 @@ void setup() {
 
   
 
-  // rozdzielczość i jakość
+  //quality and frame size settings
   config.frame_size = FRAMESIZE_VGA; // FRAMESIZE_SVGA, UXGA, QVGA, ...
-  config.jpeg_quality = 8;           // 0-63 (niższa = lepsza jakość)
+  config.jpeg_quality = 8;           // 0-63 (lower number means higher quality)
   config.fb_count = 1;
 
   pinMode(LED_FLASH, OUTPUT);  
 
 
 
-  // Inicjalizacja kamery
+  // Camera init
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Błąd inicjalizacji kamery: 0x%x", err);
@@ -121,7 +121,7 @@ void setup() {
     return;
   }
 
-  // Łączenie z Wi-Fi
+  // Connect to Wi-Fi
 
   WiFi.begin(ssid, password);
   Serial.print("Łączenie z WiFi");
@@ -140,15 +140,15 @@ void setup() {
   webSocket.enableHeartbeat(10000, 3000, 2);
 
   sensor = esp_camera_sensor_get();
-  //sensor->set_vflip(sensor, 1); //odwrocenie kamery
+  //sensor->set_vflip(sensor, 1);
   //sensor->set_hmirror(sensor, 1);
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
-const unsigned long timerSend = 500; // co ile milisekund generowac i wysylac obraz
-const unsigned long timerWifi = 1000; // co ile milisekund sprawdzac czy urzadzenie jest polaczone z wifi
-const unsigned long timerNight = 60000; // co ile milisekund sprawdzac czy przelaczyc urzadzenie na tryb nocny
+const unsigned long timerSend = 500; // time interval for sending images (in milliseconds)
+const unsigned long timerWifi = 1000; // time interval for checking wifi connection (in milliseconds)
+const unsigned long timerNight = 60000; //  time interval for checking night mode (in milliseconds)
 
 unsigned long lastNightCheck = 0;
 unsigned long lastImageSend = 0;
@@ -165,7 +165,7 @@ void CheckWifiConnection(){
       WiFi.begin(ssid, password);
       noWifiCounter++;
 
-      if (noWifiCounter >= maxWifiAttempts) { // Po 30 sekundach restart urzadzenia
+      if (noWifiCounter >= maxWifiAttempts) { // After 30 failed attempts, restart ESP
         Serial.println("WiFi reconnect failed after 30 tries. Restarting ESP...");
         noWifiCounter = 0;
         ESP.restart();
@@ -177,7 +177,7 @@ void CheckWifiConnection(){
   }
 }
 void SendImage(){
-  // Wysyłanie zdjęcia co 'timerDelay' ms
+  // Sending image every 'timerSend' ms
   if (millis() - lastImageSend > timerSend) {
     if (WiFi.status() != WL_CONNECTED){
       Serial.println("WiFi not connected");
