@@ -16,7 +16,7 @@ const (
 	// MotionThreshold is the default pixel threshold for motion detection.
 	MotionThreshold = 500
 	// DetectionThreshold is the minimum confidence for object detections.
-	DetectionThreshold = 0.5
+	DetectionThreshold = 0.6
 )
 
 type DetectionResult struct {
