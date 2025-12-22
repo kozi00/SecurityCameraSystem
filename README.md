@@ -27,6 +27,7 @@ ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
 - SSD Mobilenet v1 COCO - pre-trained object detection model
 - HTML5/CSS3, vanilla JavaScript – frontend without frameworks
 - DNS, Port-forwarding - network configuration for remote access
+- Docker - easy enviroment setup
 
 ##  How It Works – Step by Step
 
