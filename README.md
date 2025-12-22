@@ -2,7 +2,7 @@
 
 Real-time video surveillance system using ESP32-CAM and Go web server.
 
-https://github.com/user-attachments/assets/37ed7cb8-430b-42d5-8277-bd959632e53d
+https://github.com/user-attachments/assets/af57837d-b1cb-4756-a829-995996c15331
 
 ![86aa94ae-e85a-48ce-b732-a09719383f28](https://github.com/user-attachments/assets/a687173f-ba33-4acb-b651-203c552cae4e)
 
@@ -26,6 +26,7 @@ ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
 - GoCV - Go wrapper for OpenCV
 - SSD Mobilenet v1 COCO - pre-trained object detection model
 - HTML5/CSS3, vanilla JavaScript – frontend without frameworks
+- DNS, Port-forwarding - network configuration for remote access
 
 ##  How It Works – Step by Step
 
