@@ -4,10 +4,14 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 // Config holds application configuration loaded from environment variables
 // or default values when env vars are not present.
+
+type CameraID string
+
 type Config struct {
 	Port              int
 	Password          string
@@ -16,6 +20,8 @@ type Config struct {
 	ImageDirectory    string
 	ProcessingWorkers int
 	LogDirectory      string
+	CamerasPort       int
+	CameraNames       map[string]string
 }
 
 // Load reads configuration from environment variables and returns a Config instance.
@@ -28,6 +34,8 @@ func Load() *Config {
 		ImageDirectory:    getEnv("IMAGE_DIR", filepath.Join(".", "static", "images")),
 		LogDirectory:      getEnv("LOG_DIR", filepath.Join(".", "logs")),
 		ProcessingWorkers: getEnvAsInt("PROCESSING_WORKERS", 4), // 4 worker threads of ai processing
+		CamerasPort:       getEnvAsInt("CAMERAS_PORT", 81),
+		CameraNames:       parseCameraEnv(getEnv("CAMERAS", "")),
 	}
 }
 
@@ -47,4 +55,26 @@ func getEnvAsInt(key string, defaultValue int) int {
 		}
 	}
 	return defaultValue
+}
+
+func parseCameraEnv(envValue string) map[string]string {
+	cameras := make(map[string]string)
+
+	if envValue == "" {
+		return map[string]string{
+			"192.168.1.32": "drzwi",
+			"192.168.1.29": "brama",
+		}
+	}
+
+	pairs := strings.Split(envValue, ",")
+	for _, pair := range pairs {
+		parts := strings.Split(strings.TrimSpace(pair), ":")
+		if len(parts) == 2 {
+			ip := strings.TrimSpace(parts[0])
+			name := strings.TrimSpace(parts[1])
+			cameras[ip] = name
+		}
+	}
+	return cameras
 }

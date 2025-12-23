@@ -37,12 +37,15 @@ func SetupRoutes(manager *services.Manager, cfg *config.Config, logger *logger.L
 	// Static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
+	// Start UDP camera handler in a separate goroutine
+	go handlers.UDPCameraHandler(manager, logger, cfg)
+
 	// API endpoints
 	mux.HandleFunc("/api/view", handlers.ViewWebsocketHandler(manager, logger))
-	mux.HandleFunc("/api/camera", handlers.CameraWebsocketHandler(manager, logger))
 	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler(cfg, logger))
 	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler(cfg))
 	mux.HandleFunc("/api/pictures/clear", handlers.ClearPicturesHandler(cfg, logger))
+
 	// Log endpoints
 	mux.HandleFunc("/logs/info", handlers.ShowInfoLogsHandler(cfg))
 	mux.HandleFunc("/logs/warning", handlers.ShowWarningLogsHandler(cfg))

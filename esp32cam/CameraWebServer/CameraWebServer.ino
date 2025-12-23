@@ -1,8 +1,7 @@
 #include "esp_camera.h"
 #include "time.h"
 #include <WiFi.h>
-#include <HTTPClient.h>
-#include <WebSocketsClient.h>
+#include <WiFiUDP.h>
 
 //data for time synchronization
 const char* ntpServer = "pool.ntp.org";
@@ -13,12 +12,12 @@ const int   daylightOffset_sec = 3600;  // daylight saving time
 const char* ssid = "Orange_Swiatlowod_3060";
 const char* password = "4X4y2NqTCpkf9U9Cdn";
 
-const char* serverIp = "192.168.1.13"; // server IP
-const char* endpoint = "/api/camera?id=drzwi";
-uint16_t port = 80;
-//const char* endpoint = "/api/camera?id=brama";
+//udp settings
+uint16_t udpPort = 81;
+IPAddress serverIp(192, 168, 1, 42);
+const int maxUdpPacketSize = 1436; 
+WiFiUDP udp;
 
-WebSocketsClient webSocket;
 sensor_t * sensor;
 
 
@@ -46,32 +45,6 @@ sensor_t * sensor;
 #error "Wybierz poprawny model kamery!"
 #endif
 
-void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-    switch(type) {
-        case WStype_DISCONNECTED:
-            Serial.println("[WSc] Disconnected!\n");
-            break;
-        case WStype_CONNECTED:
-            Serial.println("[WSc] Connected\n");
-            break;
-        case WStype_PING: 
-            Serial.println("[WSc] Received ping");
-            break;
-        case WStype_PONG:  
-            Serial.println("[WSc] Received pong");
-            break;
-        case WStype_TEXT:
-        case WStype_BIN:
-        case WStype_ERROR:		
-            Serial.println("Error\n");	
-            break;
-        case WStype_FRAGMENT_TEXT_START:
-        case WStype_FRAGMENT_BIN_START:
-        case WStype_FRAGMENT:
-        case WStype_FRAGMENT_FIN:
-            break;
-    }
-}
 
 
 
@@ -134,11 +107,6 @@ void setup() {
   Serial.print("Adres IP: ");
   Serial.println(WiFi.localIP());
 
-  webSocket.begin(serverIp, port, endpoint);
-  webSocket.onEvent(webSocketEvent);
-  webSocket.setReconnectInterval(5000);
-  webSocket.enableHeartbeat(10000, 3000, 2);
-
   sensor = esp_camera_sensor_get();
   //sensor->set_vflip(sensor, 1);
   //sensor->set_hmirror(sensor, 1);
@@ -183,19 +151,39 @@ void SendImage(){
       Serial.println("WiFi not connected");
       return;
     }
-    if(!webSocket.isConnected()){
-      Serial.println("Websocket not connected");
-      return;
-    }
 
     camera_fb_t *fb = esp_camera_fb_get();
     if (!fb) {
       Serial.println("Failed to capture image");
       return;
     }
-    bool success = webSocket.sendBIN(fb->buf, fb->len);
-    if (!success) {
-      Serial.println("Failed to send image");
+    uint8_t *buffer = fb->buf;
+    size_t length = fb->len;
+    size_t offset = 0;
+
+    while(offset < length){ 
+      size_t chunkSize = min((size_t)maxUdpPacketSize, length - offset);
+      
+      int beginResult = udp.beginPacket(serverIp, udpPort);
+      
+      if (beginResult == 1) {
+          udp.write(buffer + offset, chunkSize);
+          int udpStatus = udp.endPacket();
+          if (udpStatus == 0) {
+             Serial.println("Error while sending package");
+             delay(10); 
+          }
+          else if(udpStatus == 1){
+            Serial.println("Package sent");
+          }
+      } else {
+          Serial.print("Error(wifi or server problem)");
+          Serial.println(WiFi.status());
+          break; 
+      }
+
+      offset += chunkSize;
+      
     }
     esp_camera_fb_return(fb);
     lastImageSend = millis();
@@ -235,7 +223,6 @@ void SetMode(){
 */
 void loop() {
   //SetMode();
-  webSocket.loop();  
   SendImage();
   CheckWifiConnection();
 }

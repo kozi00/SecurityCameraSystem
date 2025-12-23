@@ -148,6 +148,7 @@ ENV CONFIG_PATH="/app/internal/services/ai/ssd_mobilenet_v1_coco_2017_11_17.pbtx
 ENV IMAGE_DIR="/app/static/images"
 ENV LOG_DIR="/app/logs"
 ENV PROCESSING_WORKERS=4
-
+ENV CAMERAS_PORT=81
+ENV CAMERAS="192.168.1.32:drzwi,192.168.1.29:brama"
 # Run the application
 CMD ["/app/server"]
