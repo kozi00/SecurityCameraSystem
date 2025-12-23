@@ -9,12 +9,12 @@ const long  gmtOffset_sec = 3600;       // Poland +1 hour
 const int   daylightOffset_sec = 3600;  // daylight saving time
 
 //wifi data
-const char* ssid = "Orange_Swiatlowod_3060";
-const char* password = "4X4y2NqTCpkf9U9Cdn";
+const char* ssid = "Orange_IoT_3060";
+const char* password = "JqyiQwng59Xm32U4ef";
 
 //udp settings
 uint16_t udpPort = 81;
-IPAddress serverIp(192, 168, 1, 42);
+IPAddress serverIp(192, 168, 1, 13);
 const int maxUdpPacketSize = 1436; 
 WiFiUDP udp;
 
