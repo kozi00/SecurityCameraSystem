@@ -9,7 +9,7 @@ https://github.com/user-attachments/assets/af57837d-b1cb-4756-a829-995996c15331
 ##  Architecture
 
 ```
-ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
+ESP32-CAM → UDP → Go Server → WebSocket → Browser
                            ↓                      ↓      
                         Manager              Real-time Video
                            ↓                    
@@ -18,56 +18,51 @@ ESP32-CAM → WebSocket → Go Server → WebSocket → Browser
             Save image to disk if motion detected
 ```
 
-##  Tech Stack
-- Orange PI RV2 - mini-computer as server
-- ESP32‑CAM (Arduino) – video capture device programming in C
-- Go (1.21+) – net/http, goroutines, mutex
-- Gorilla WebSocket – bidirectional real-time communication
-- GoCV - Go wrapper for OpenCV
-- SSD Mobilenet v1 COCO - pre-trained object detection model
-- HTML5/CSS3, vanilla JavaScript – frontend without frameworks
-- DNS, Port-forwarding - network configuration for remote access
-- Docker - easy enviroment setup
+## Tech Stack
+- **Hardware:** Orange PI RV2 (Server), ESP32‑CAM (Camera)
+- **Camera Firmware:** C++ (Arduino IDE), UDP protocol for video streaming
+- **Backend:** Go (1.21+) – `net` (UDP), `net/http`, goroutines, mutex
+- **Communication:** - **Ingress:** UDP (Low latency video streaming from cameras)
+  - **Egress:** Gorilla WebSocket (Real-time broadcasting to clients)
+- **Computer Vision:** GoCV (OpenCV wrapper), SSD Mobilenet v1 COCO
+- **Frontend:** HTML5/CSS3, vanilla JavaScript
+- **Infrastructure:** Docker, Docker Compose
 
-##  How It Works – Step by Step
+## How It Works – Step by Step
 
 ### 1) Server Startup
-1. Application starts HTTP server
-2. Configuration and logger are initialized
-3. Service manager is created (WebSocket hub, storage, optional AI) in `internal/services`
-4. Routes are registered in `internal/routes.SetupRoutes()` and `AuthMiddleware` is applied
+1. Application starts HTTP server for viewers and UDP listener for cameras.
+2. Configuration (`.env`) is loaded, mapping Camera IPs to friendly names (e.g., "Door", "Gate").
+3. Service manager is created (WebSocket hub, storage, AI, UDP handler) in `internal/services`.
+4. Routes are registered in `internal/routes.SetupRoutes()`.
 
 ### 2) User Interface Access
-1. User opens `/`. `dynamicHTMLHandler` maps path to appropriate HTML file in `static/` (e.g., `/` → `static/index.html`)
-2. Browser loads CSS/JS from `/static/*` and initializes WebSocket connection to `/api/view` (viewer channel)
-3. UI shows placeholders and connection status (online/offline), as well as camera activity indicators
+1. User opens `/`. `dynamicHTMLHandler` maps path to appropriate HTML file.
+2. Browser loads CSS/JS and initializes WebSocket connection to `/api/view`.
+3. UI shows placeholders and connection status.
 
-### 3) Camera Frame Delivery
-1. Camera connects via WebSocket to `/api/camera` and transmits JPEG frames. Server forwards them to manager
-2. Resolution and frame rate are configured on camera side
-3. If camera doesn't respond to ping signal, connection is considered dead; maximum message size is also set
+### 3) Camera Frame Delivery (UDP)
+1. **Fragmentation:** ESP32-CAM captures a JPEG frame and splits it into small chunks (max ~1436 bytes) to fit within network MTU.
+2. **Streaming:** Chunks are sent via UDP to the server's specific port (e.g., 81).
+3. **Reassembly:** Go Server listens on the UDP port. It identifies the camera by source IP address.
+4. **Buffering:** Server reassembles chunks into a full JPEG frame. Once a valid start (0xFF, 0xD8) and end (0xFF, 0xD9) markers are found, the frame is passed to the Manager.
 
 ### 4) Broadcast to Viewers
-1. WebSocket Hub (`internal/services/websocket`) broadcasts to all clients connected to `/api/view` JSON text messages:
+1. WebSocket Hub broadcasts the complete JPEG frame to all connected clients as a JSON message:
         `{ "camera": "<name>", "image": "<base64 JPEG>" }`
-2. Frontend sets image `img.src = "data:image/jpeg;base64,<...>"`, hides placeholder and marks camera as active
-3. UI timer marks camera as offline if no frame arrives for specified time (e.g., 10s)
+2. Frontend updates the `img.src` attribute with the Base64 data.
+3. UI timer marks camera as offline if no frame arrives for a specified time.
 
 ### 5) AI and Storage
-1. Each frame is checked for motion detection
-2. If motion detected, object recognition is attempted via one of the threads (object recognition is multi-threaded for performance)
-3. When object is successfully recognized, a red rectangle is drawn around it and image is sent to buffer service
-4. Frames wait in queue which cyclically saves queued frames to disk
-5. Saved images gallery available at `/api/pictures`, view: `/api/pictures/view`, clear: `/api/pictures/clear`
+1. Each assembled frame is passed to the motion detection service.
+2. If motion is detected, the frame is queued for AI Object Recognition (multi-threaded).
+3. If an object is recognized (e.g., Person, Car), a bounding box is drawn, and the image is saved to disk via `bufferService`.
+4. Saved images are available in the gallery (`/api/pictures`).
 
-### 6) Gallery
-1. Photo data such as date, time, object and camera are contained in filename
-2. This allows easy extraction of this data from JPG files, giving gallery advanced filter functionality to easily find selected photos
-
-### 7) Logs and Administration
-1. Operation logs: `/logs/info`, `/logs/warning`, `/logs/error`; clear: `/logs/*/clear`
-2. Authorization: `/auth/login` (GET/POST) and `/auth/logout`. Most routes are protected by `AuthMiddleware`
-3. Log files are easily accessible from web interface
+### 6) Gallery & Logs
+1. Filenames contain metadata (date, time, object, camera).
+2. Advanced filtering available in the UI.
+3. Logs accessible via `/logs/*` endpoints.
 
 ##  Structure 
 
@@ -116,16 +111,27 @@ WebServer/
 // In CameraWebServer.ino change:
 const char* ssid = "YourWiFi";
 const char* password = "YourPassword";
-const char* serverURL = "http://SERVER_IP:PORT/upload";
-// Additionally, for different cameras add different query as 'camera' id e.g. /api/camera?id=door
+// Server Configuration (UDP Target)
+// Note: Use commas, not dots for IPAddress
+IPAddress serverIp(192, 168, 1, 10); 
+const uint16_t udpPort = 81;          // Must match CAMERAS_PORT in .env
 ```
 
 ### 2. Password Setup
 1. Create `.env` file in WebServer folder
-2. Add password and port as follows:
+2. Add variables as follows:
 ```env
-PASSWORD=example_password
-PORT=80
+# Server Auth and Web Port
+PASSWORD=password123
+PORT=8080
+
+# UDP Configuration
+CAMERAS_PORT=81
+# Format: IP:Name,IP:Name
+CAMERAS="192.168.1.32:Gate,192.168.1.33:Door"
+
+# Performance
+PROCESSING_WORKERS=4
 ```
 
 ### 3. Running Go Server (Native)
@@ -156,9 +162,10 @@ The project includes pre-configured Docker files in `WebServer/` directory:
 
 Create `.env` file in `WebServer/` directory:
 ```env
-PASSWORD=your_secure_password
+PASSWORD=password123
 PORT=8080
-HOST_PORT=8080
+CAMERAS_PORT=81
+CAMERAS="192.168.1.32:Gate,192.168.1.33:Door"
 PROCESSING_WORKERS=4
 ```
 
