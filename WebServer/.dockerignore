@@ -37,6 +37,10 @@ logs/*
 static/images/*
 !static/images/.gitkeep
 
+# Database
+data/*
+!data/.gitkeep
+
 # Docker
 Dockerfile
 .dockerignore

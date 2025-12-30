@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 	"webserver/internal/config"
+	"webserver/internal/database"
 	"webserver/internal/logger"
 )
 
@@ -31,15 +32,17 @@ type BufferService struct {
 	bufferCount map[string]int
 	mu          sync.Mutex
 	logger      *logger.Logger
+	db          *database.Database
 }
 
 // NewBufferService creates a new BufferService with the target directory and logger.
-func NewBufferService(config *config.Config, logger *logger.Logger) *BufferService {
+func NewBufferService(config *config.Config, logger *logger.Logger, db *database.Database) *BufferService {
 	return &BufferService{
 		imagesDir:   config.ImageDirectory,
 		images:      make([]Image, 0),
 		bufferCount: make(map[string]int),
 		logger:      logger,
+		db:          db,
 		mu:          sync.Mutex{},
 	}
 }
@@ -89,6 +92,7 @@ func (s *BufferService) FlushImages() {
 		return
 	}
 
+	savedCount := 0
 	for _, image := range s.images {
 		objects := ""
 		for _, obj := range image.Objects {
@@ -103,9 +107,37 @@ func (s *BufferService) FlushImages() {
 			s.logger.Error("Error saving image %s: %v", filename, err)
 			continue
 		}
+
+		// Save to database if available
+		if s.db != nil {
+			ts, err := time.Parse("2006-01-02_15-04_05.000", image.Timestamp)
+			if err != nil {
+				ts = time.Now()
+			}
+
+			dbImage := &database.Image{
+				Filename:  filename,
+				Camera:    image.Camera,
+				Objects:   image.Objects,
+				Timestamp: ts,
+				FilePath:  fullpath,
+				FileSize:  int64(len(image.Data)),
+			}
+
+			if _, err := s.db.InsertImage(dbImage); err != nil {
+				s.logger.Error("Error saving image to database %s: %v", filename, err)
+			}
+		}
+
+		savedCount++
 	}
 
-	s.logger.Info("Flushed %d images to disk", len(s.images))
+	s.logger.Info("Flushed %d images to disk", savedCount)
 	s.images = s.images[:0] // Clear buffer
 	s.bufferCount = make(map[string]int)
+}
+
+// GetDatabase returns the database instance.
+func (s *BufferService) GetDatabase() *database.Database {
+	return s.db
 }

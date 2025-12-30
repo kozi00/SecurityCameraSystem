@@ -11,7 +11,9 @@ import (
 	"strings"
 	"time"
 	"webserver/internal/config"
+	"webserver/internal/database"
 	"webserver/internal/logger"
+	"webserver/internal/services"
 )
 
 const (
@@ -287,4 +289,196 @@ func parsePictureName(filename string) (PictureInfo, error) {
 		}
 	}
 	return PictureInfo{}, errors.New("invalid picture name format")
+}
+
+// =====================================================
+// Database-based handlers
+// =====================================================
+
+// GetPicturesFromDBHandler returns filtered list of images from database.
+func GetPicturesFromDBHandler(manager *services.Manager, cfg *config.Config, logger *logger.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		db := manager.GetBufferService().GetDatabase()
+		if db == nil {
+			// Fallback to file-based handler if database not available
+			DisplayPicturesHandler(cfg, logger)(w, r)
+			return
+		}
+
+		q := r.URL.Query()
+		page := atoiDefault(q.Get("page"), 1)
+		limit := atoiDefault(q.Get("limit"), 24)
+
+		filter := &database.ImageFilter{
+			Camera:     q.Get("camera"),
+			Object:     q.Get("object"),
+			StartDate:  parseDate(q.Get("dateAfter")),
+			EndDate:    parseDate(q.Get("dateBefore")),
+			TimeAfter:  q.Get("timeAfter"),
+			TimeBefore: q.Get("timeBefore"),
+			Limit:      limit,
+			Offset:     (page - 1) * limit,
+		}
+
+		images, err := db.GetImages(filter)
+		if err != nil {
+			logger.Error("Error querying images from database: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		totalCount, err := db.GetTotalCount(filter)
+		if err != nil {
+			logger.Error("Error counting images: %v", err)
+			totalCount = len(images)
+		}
+
+		// Calculate total size
+		var totalSize int64
+		for _, img := range images {
+			totalSize += img.FileSize
+		}
+
+		// Convert to PictureInfo format for backwards compatibility
+		var pictures []PictureInfo
+		for _, img := range images {
+			pictures = append(pictures, PictureInfo{
+				Name:      img.Filename,
+				Date:      img.Timestamp,
+				TimeOfDay: img.Timestamp,
+				Camera:    img.Camera,
+				Objects:   img.Objects,
+			})
+		}
+
+		data := PicturesData{
+			Pictures:    pictures,
+			ImagesDir:   cfg.ImageDirectory,
+			Size:        totalSize,
+			MaxSize:     MaxImageDirectorySize,
+			Length:      totalCount,
+			TotalPages:  (totalCount + limit - 1) / limit,
+			CurrentPage: page,
+			Limit:       limit,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(data); err != nil {
+			logger.Error("Error encoding JSON response: %v", err)
+		}
+	}
+}
+
+// GetFiltersHandler returns available cameras and objects for filtering.
+func GetFiltersHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		db := manager.GetBufferService().GetDatabase()
+		if db == nil {
+			http.Error(w, "Database not available", http.StatusInternalServerError)
+			return
+		}
+
+		cameras, err := db.GetCameras()
+		if err != nil {
+			logger.Error("Failed to get cameras: %v", err)
+			cameras = []string{}
+		}
+
+		objects, err := db.GetObjects()
+		if err != nil {
+			logger.Error("Failed to get objects: %v", err)
+			objects = []string{}
+		}
+
+		response := map[string]interface{}{
+			"cameras": cameras,
+			"objects": objects,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+// GetStatsHandler returns image statistics.
+func GetStatsHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		db := manager.GetBufferService().GetDatabase()
+		if db == nil {
+			http.Error(w, "Database not available", http.StatusInternalServerError)
+			return
+		}
+
+		stats, err := db.GetStats()
+		if err != nil {
+			logger.Error("Failed to get stats: %v", err)
+			http.Error(w, "Failed to retrieve stats", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(stats)
+	}
+}
+
+// DeletePictureHandler removes an image from disk and database.
+func DeletePictureHandler(manager *services.Manager, cfg *config.Config, logger *logger.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		filename := r.URL.Query().Get("filename")
+		if filename == "" {
+			http.Error(w, "Filename required", http.StatusBadRequest)
+			return
+		}
+
+		// Delete file from disk
+		filePath := filepath.Join(cfg.ImageDirectory, filename)
+		if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
+			logger.Error("Failed to delete file %s: %v", filePath, err)
+		}
+
+		// Delete from database if available
+		db := manager.GetBufferService().GetDatabase()
+		if db != nil {
+			if err := db.DeleteImageByFilename(filename); err != nil {
+				logger.Error("Failed to delete from database: %v", err)
+			}
+		}
+
+		logger.Info("Deleted picture: %s", filename)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"status": "deleted", "filename": filename})
+	}
+}
+
+// ClearPicturesWithDBHandler deletes all files from the image directory and clears the database.
+func ClearPicturesWithDBHandler(manager *services.Manager, cfg *config.Config, logger *logger.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		files, err := os.ReadDir(cfg.ImageDirectory)
+		if err != nil {
+			logger.Error("Error reading pictures directory: %v", err)
+			http.Error(w, "Unable to read pictures directory", http.StatusInternalServerError)
+			return
+		}
+
+		for _, file := range files {
+			if !file.IsDir() {
+				filePath := filepath.Join(cfg.ImageDirectory, file.Name())
+				err := os.Remove(filePath)
+				if err != nil {
+					logger.Error("Error deleting file %s: %v", file.Name(), err)
+				}
+			}
+		}
+
+		// Clear database if available
+		db := manager.GetBufferService().GetDatabase()
+		if db != nil {
+			if err := db.ClearAll(); err != nil {
+				logger.Error("Error clearing database: %v", err)
+			}
+		}
+
+		logger.Info("All pictures cleared from directory: %s", cfg.ImageDirectory)
+		w.WriteHeader(http.StatusNoContent)
+	}
 }

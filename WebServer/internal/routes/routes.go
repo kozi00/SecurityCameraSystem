@@ -42,9 +42,12 @@ func SetupRoutes(manager *services.Manager, cfg *config.Config, logger *logger.L
 
 	// API endpoints
 	mux.HandleFunc("/api/view", handlers.ViewWebsocketHandler(manager, logger))
-	mux.HandleFunc("/api/pictures", handlers.DisplayPicturesHandler(cfg, logger))
+	mux.HandleFunc("/api/pictures", handlers.GetPicturesFromDBHandler(manager, cfg, logger))
 	mux.HandleFunc("/api/pictures/view", handlers.ViewPictureHandler(cfg))
-	mux.HandleFunc("/api/pictures/clear", handlers.ClearPicturesHandler(cfg, logger))
+	mux.HandleFunc("/api/pictures/clear", handlers.ClearPicturesWithDBHandler(manager, cfg, logger))
+	mux.HandleFunc("/api/pictures/delete", handlers.DeletePictureHandler(manager, cfg, logger))
+	mux.HandleFunc("/api/pictures/filters", handlers.GetFiltersHandler(manager, logger))
+	mux.HandleFunc("/api/pictures/stats", handlers.GetStatsHandler(manager, logger))
 
 	// Log endpoints
 	mux.HandleFunc("/logs/info", handlers.ShowInfoLogsHandler(cfg))

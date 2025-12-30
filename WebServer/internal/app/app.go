@@ -3,7 +3,10 @@ package app
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"webserver/internal/config"
+	"webserver/internal/database"
 	"webserver/internal/logger"
 	"webserver/internal/routes"
 	"webserver/internal/services"
@@ -20,6 +23,7 @@ type App struct {
 	bufferService    *storage.BufferService
 	hubService       *websocket.HubService
 	manager          *services.Manager
+	db               *database.Database
 }
 
 // NewApp constructs the application, initializing all services and dependencies.
@@ -28,12 +32,27 @@ func NewApp() *App {
 	cfg := config.Load()
 	logger := logger.NewLogger(cfg)
 
+	// Ensure database directory exists
+	dbDir := filepath.Dir(cfg.DatabasePath)
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		logger.Error("Failed to create database directory: %v", err)
+	}
+
+	// Initialize database
+	db, err := database.New(cfg.DatabasePath)
+	if err != nil {
+		logger.Error("Failed to initialize database: %v", err)
+		db = nil // Continue without database
+	} else {
+		logger.Info("📦 Database initialized at %s", cfg.DatabasePath)
+	}
+
 	detectors := make([]*ai.DetectorService, 0, cfg.ProcessingWorkers)
 	for i := 0; i < cfg.ProcessingWorkers; i++ { //creating a few detector services to handle image processing asynchronously
 		ds := ai.NewDetectorService(cfg, logger)
 		detectors = append(detectors, ds)
 	}
-	buffer := storage.NewBufferService(cfg, logger)
+	buffer := storage.NewBufferService(cfg, logger, db)
 	hub := websocket.NewHubService(cfg, logger)
 
 	mng := services.NewManager(detectors, buffer, hub, cfg, logger)
@@ -45,12 +64,18 @@ func NewApp() *App {
 		hubService:       hub,
 		manager:          mng,
 		logger:           logger,
+		db:               db,
 	}
 }
 
 // Run starts background services, sets up routes and blocks serving HTTP.
 // Returns any error produced by http.ListenAndServe.
 func (a *App) Run() error {
+	// Close database on exit
+	if a.db != nil {
+		defer a.db.Close()
+	}
+
 	// Start background services
 	go a.bufferService.Run()
 	go a.hubService.Run()
@@ -63,6 +88,7 @@ func (a *App) Run() error {
 	a.logger.Info("🔑 Password: %s\n", a.config.Password)
 	a.logger.Info("📁 Images: %s\n", a.config.ImageDirectory)
 	a.logger.Info("🤖 AI Model: %s\n", a.config.ModelPath)
+	a.logger.Info("📦 Database: %s\n", a.config.DatabasePath)
 
 	return http.ListenAndServe(fmt.Sprintf(":%d", a.config.Port), router)
 }
