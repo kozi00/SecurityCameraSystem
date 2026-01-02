@@ -146,14 +146,11 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 			imageWithDetections = image
 		}
 
-		var detectionsStr []string // Store up to 5 detected object labels
-		for i, det := range detections {
-			if i >= 5 {
-				break
-			}
-			detectionsStr = append(detectionsStr, det.Label)
+		// Limit to 5 detections max
+		if len(detections) > 5 {
+			detections = detections[:5]
 		}
 
-		m.bufferService.AddImage(imageWithDetections, camera, detectionsStr)
+		m.bufferService.AddImage(imageWithDetections, camera, detections)
 	}
 }

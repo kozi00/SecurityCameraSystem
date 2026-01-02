@@ -7,8 +7,10 @@ import (
 	"sync"
 	"time"
 	"webserver/internal/config"
-	"webserver/internal/database"
 	"webserver/internal/logger"
+	"webserver/internal/models"
+	"webserver/internal/repository"
+	"webserver/internal/services/ai"
 )
 
 const (
@@ -18,32 +20,35 @@ const (
 	ImageBufferFlushInterval = 30
 )
 
-type Image struct {
-	Timestamp string
-	Camera    string
-	Objects   []string
-	Data      []byte
+// BufferedImage holds image data and detection results before flushing to disk.
+type BufferedImage struct {
+	Timestamp  string
+	Camera     string
+	Detections []ai.DetectionResult
+	Data       []byte
 }
 
 // BufferService buffers images in memory and periodically flushes them to disk.
 type BufferService struct {
-	imagesDir   string
-	images      []Image
-	bufferCount map[string]int
-	mu          sync.Mutex
-	logger      *logger.Logger
-	db          *database.Database
+	imagesDir     string
+	images        []BufferedImage
+	bufferCount   map[string]int
+	mu            sync.Mutex
+	logger        *logger.Logger
+	imageRepo     repository.ImageRepository
+	detectionRepo repository.DetectionRepository
 }
 
 // NewBufferService creates a new BufferService with the target directory and logger.
-func NewBufferService(config *config.Config, logger *logger.Logger, db *database.Database) *BufferService {
+func NewBufferService(config *config.Config, logger *logger.Logger, imageRepo repository.ImageRepository, detectionRepo repository.DetectionRepository) *BufferService {
 	return &BufferService{
-		imagesDir:   config.ImageDirectory,
-		images:      make([]Image, 0),
-		bufferCount: make(map[string]int),
-		logger:      logger,
-		db:          db,
-		mu:          sync.Mutex{},
+		imagesDir:     config.ImageDirectory,
+		images:        make([]BufferedImage, 0),
+		bufferCount:   make(map[string]int),
+		logger:        logger,
+		imageRepo:     imageRepo,
+		detectionRepo: detectionRepo,
+		mu:            sync.Mutex{},
 	}
 }
 
@@ -59,16 +64,16 @@ func (s *BufferService) Run() {
 }
 
 // AddImage appends an image to the in-memory buffer for a given camera.
-func (s *BufferService) AddImage(imageData []byte, cameraId string, objects []string) {
+func (s *BufferService) AddImage(imageData []byte, cameraId string, detections []ai.DetectionResult) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	timestamp := time.Now().Format("2006-01-02_15-04_05.000")
-	image := Image{
-		Timestamp: timestamp,
-		Camera:    cameraId,
-		Objects:   objects,
-		Data:      imageData,
+	image := BufferedImage{
+		Timestamp:  timestamp,
+		Camera:     cameraId,
+		Detections: detections,
+		Data:       imageData,
 	}
 
 	if s.bufferCount[cameraId] < ImageBufferLimit {
@@ -94,10 +99,10 @@ func (s *BufferService) FlushImages() {
 
 	savedCount := 0
 	for _, image := range s.images {
+		// Build filename with detected object names
 		objects := ""
-		for _, obj := range image.Objects {
-			objects += obj
-			objects += "_"
+		for _, det := range image.Detections {
+			objects += det.Label + "_"
 		}
 
 		filename := fmt.Sprintf("%s_%s_%s.jpg", image.Timestamp, image.Camera, objects)
@@ -108,24 +113,44 @@ func (s *BufferService) FlushImages() {
 			continue
 		}
 
-		// Save to database if available
-		if s.db != nil {
+		// Save to database if repositories are available
+		if s.imageRepo != nil {
 			ts, err := time.Parse("2006-01-02_15-04_05.000", image.Timestamp)
 			if err != nil {
 				ts = time.Now()
 			}
 
-			dbImage := &database.Image{
+			dbImage := &models.Image{
 				Filename:  filename,
 				Camera:    image.Camera,
-				Objects:   image.Objects,
 				Timestamp: ts,
 				FilePath:  fullpath,
 				FileSize:  int64(len(image.Data)),
 			}
 
-			if _, err := s.db.InsertImage(dbImage); err != nil {
+			imageID, err := s.imageRepo.Insert(dbImage)
+			if err != nil {
 				s.logger.Error("Error saving image to database %s: %v", filename, err)
+				continue
+			}
+
+			// Insert detections for this image
+			if s.detectionRepo != nil && len(image.Detections) > 0 {
+				var dbDetections []models.Detection
+				for _, det := range image.Detections {
+					dbDetections = append(dbDetections, models.Detection{
+						ImageID:    imageID,
+						ObjectName: det.Label,
+						X:          det.X,
+						Y:          det.Y,
+						Width:      det.Width,
+						Height:     det.Height,
+						Confidence: det.Confidence,
+					})
+				}
+				if err := s.detectionRepo.InsertBatch(dbDetections); err != nil {
+					s.logger.Error("Error saving detections to database: %v", err)
+				}
 			}
 		}
 
@@ -137,7 +162,12 @@ func (s *BufferService) FlushImages() {
 	s.bufferCount = make(map[string]int)
 }
 
-// GetDatabase returns the database instance.
-func (s *BufferService) GetDatabase() *database.Database {
-	return s.db
+// GetImageRepository returns the image repository.
+func (s *BufferService) GetImageRepository() repository.ImageRepository {
+	return s.imageRepo
+}
+
+// GetDetectionRepository returns the detection repository.
+func (s *BufferService) GetDetectionRepository() repository.DetectionRepository {
+	return s.detectionRepo
 }

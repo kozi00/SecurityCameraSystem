@@ -6,8 +6,9 @@ import (
 	"os"
 	"path/filepath"
 	"webserver/internal/config"
-	"webserver/internal/database"
 	"webserver/internal/logger"
+	"webserver/internal/repository"
+	"webserver/internal/repository/sqlite"
 	"webserver/internal/routes"
 	"webserver/internal/services"
 	"webserver/internal/services/ai"
@@ -23,7 +24,9 @@ type App struct {
 	bufferService    *storage.BufferService
 	hubService       *websocket.HubService
 	manager          *services.Manager
-	db               *database.Database
+	db               *sqlite.DB
+	imageRepo        repository.ImageRepository
+	detectionRepo    repository.DetectionRepository
 }
 
 // NewApp constructs the application, initializing all services and dependencies.
@@ -38,21 +41,27 @@ func NewApp() *App {
 		logger.Error("Failed to create database directory: %v", err)
 	}
 
-	// Initialize database
-	db, err := database.New(cfg.DatabasePath)
+	// Initialize database and repositories
+	var db *sqlite.DB
+	var imageRepo repository.ImageRepository
+	var detectionRepo repository.DetectionRepository
+
+	db, err := sqlite.New(cfg.DatabasePath)
 	if err != nil {
 		logger.Error("Failed to initialize database: %v", err)
-		db = nil // Continue without database
+		db = nil
 	} else {
 		logger.Info("📦 Database initialized at %s", cfg.DatabasePath)
+		imageRepo = sqlite.NewImageRepository(db)
+		detectionRepo = sqlite.NewDetectionRepository(db)
 	}
 
 	detectors := make([]*ai.DetectorService, 0, cfg.ProcessingWorkers)
-	for i := 0; i < cfg.ProcessingWorkers; i++ { //creating a few detector services to handle image processing asynchronously
+	for i := 0; i < cfg.ProcessingWorkers; i++ {
 		ds := ai.NewDetectorService(cfg, logger)
 		detectors = append(detectors, ds)
 	}
-	buffer := storage.NewBufferService(cfg, logger, db)
+	buffer := storage.NewBufferService(cfg, logger, imageRepo, detectionRepo)
 	hub := websocket.NewHubService(cfg, logger)
 
 	mng := services.NewManager(detectors, buffer, hub, cfg, logger)
@@ -65,6 +74,8 @@ func NewApp() *App {
 		manager:          mng,
 		logger:           logger,
 		db:               db,
+		imageRepo:        imageRepo,
+		detectionRepo:    detectionRepo,
 	}
 }
 

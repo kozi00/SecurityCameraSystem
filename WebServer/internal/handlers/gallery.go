@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 	"webserver/internal/config"
-	"webserver/internal/database"
 	"webserver/internal/logger"
+	"webserver/internal/models"
 	"webserver/internal/services"
 )
 
@@ -298,8 +298,9 @@ func parsePictureName(filename string) (PictureInfo, error) {
 // GetPicturesFromDBHandler returns filtered list of images from database.
 func GetPicturesFromDBHandler(manager *services.Manager, cfg *config.Config, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		db := manager.GetBufferService().GetDatabase()
-		if db == nil {
+		imageRepo := manager.GetBufferService().GetImageRepository()
+		detectionRepo := manager.GetBufferService().GetDetectionRepository()
+		if imageRepo == nil {
 			// Fallback to file-based handler if database not available
 			DisplayPicturesHandler(cfg, logger)(w, r)
 			return
@@ -309,7 +310,7 @@ func GetPicturesFromDBHandler(manager *services.Manager, cfg *config.Config, log
 		page := atoiDefault(q.Get("page"), 1)
 		limit := atoiDefault(q.Get("limit"), 24)
 
-		filter := &database.ImageFilter{
+		filter := &models.ImageFilter{
 			Camera:     q.Get("camera"),
 			Object:     q.Get("object"),
 			StartDate:  parseDate(q.Get("dateAfter")),
@@ -320,14 +321,14 @@ func GetPicturesFromDBHandler(manager *services.Manager, cfg *config.Config, log
 			Offset:     (page - 1) * limit,
 		}
 
-		images, err := db.GetImages(filter)
+		images, err := imageRepo.GetAll(filter)
 		if err != nil {
 			logger.Error("Error querying images from database: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		totalCount, err := db.GetTotalCount(filter)
+		totalCount, err := imageRepo.GetTotalCount(filter)
 		if err != nil {
 			logger.Error("Error counting images: %v", err)
 			totalCount = len(images)
@@ -342,12 +343,22 @@ func GetPicturesFromDBHandler(manager *services.Manager, cfg *config.Config, log
 		// Convert to PictureInfo format for backwards compatibility
 		var pictures []PictureInfo
 		for _, img := range images {
+			// Get object names for this image
+			var objects []string
+			if detectionRepo != nil {
+				objects, err = detectionRepo.GetObjectNamesByImageID(img.ID)
+				if err != nil {
+					logger.Error("Error getting objects for image %d: %v", img.ID, err)
+					objects = []string{}
+				}
+			}
+
 			pictures = append(pictures, PictureInfo{
 				Name:      img.Filename,
 				Date:      img.Timestamp,
 				TimeOfDay: img.Timestamp,
 				Camera:    img.Camera,
-				Objects:   img.Objects,
+				Objects:   objects,
 			})
 		}
 
@@ -372,22 +383,26 @@ func GetPicturesFromDBHandler(manager *services.Manager, cfg *config.Config, log
 // GetFiltersHandler returns available cameras and objects for filtering.
 func GetFiltersHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		db := manager.GetBufferService().GetDatabase()
-		if db == nil {
+		imageRepo := manager.GetBufferService().GetImageRepository()
+		detectionRepo := manager.GetBufferService().GetDetectionRepository()
+		if imageRepo == nil {
 			http.Error(w, "Database not available", http.StatusInternalServerError)
 			return
 		}
 
-		cameras, err := db.GetCameras()
+		cameras, err := imageRepo.GetCameras()
 		if err != nil {
 			logger.Error("Failed to get cameras: %v", err)
 			cameras = []string{}
 		}
 
-		objects, err := db.GetObjects()
-		if err != nil {
-			logger.Error("Failed to get objects: %v", err)
-			objects = []string{}
+		var objects []string
+		if detectionRepo != nil {
+			objects, err = detectionRepo.GetAllObjectNames()
+			if err != nil {
+				logger.Error("Failed to get objects: %v", err)
+				objects = []string{}
+			}
 		}
 
 		response := map[string]interface{}{
@@ -403,13 +418,13 @@ func GetFiltersHandler(manager *services.Manager, logger *logger.Logger) http.Ha
 // GetStatsHandler returns image statistics.
 func GetStatsHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		db := manager.GetBufferService().GetDatabase()
-		if db == nil {
+		imageRepo := manager.GetBufferService().GetImageRepository()
+		if imageRepo == nil {
 			http.Error(w, "Database not available", http.StatusInternalServerError)
 			return
 		}
 
-		stats, err := db.GetStats()
+		stats, err := imageRepo.GetStats()
 		if err != nil {
 			logger.Error("Failed to get stats: %v", err)
 			http.Error(w, "Failed to retrieve stats", http.StatusInternalServerError)
@@ -437,9 +452,9 @@ func DeletePictureHandler(manager *services.Manager, cfg *config.Config, logger 
 		}
 
 		// Delete from database if available
-		db := manager.GetBufferService().GetDatabase()
-		if db != nil {
-			if err := db.DeleteImageByFilename(filename); err != nil {
+		imageRepo := manager.GetBufferService().GetImageRepository()
+		if imageRepo != nil {
+			if err := imageRepo.DeleteByFilename(filename); err != nil {
 				logger.Error("Failed to delete from database: %v", err)
 			}
 		}
@@ -471,9 +486,9 @@ func ClearPicturesWithDBHandler(manager *services.Manager, cfg *config.Config, l
 		}
 
 		// Clear database if available
-		db := manager.GetBufferService().GetDatabase()
-		if db != nil {
-			if err := db.ClearAll(); err != nil {
+		imageRepo := manager.GetBufferService().GetImageRepository()
+		if imageRepo != nil {
+			if err := imageRepo.DeleteAll(); err != nil {
 				logger.Error("Error clearing database: %v", err)
 			}
 		}
