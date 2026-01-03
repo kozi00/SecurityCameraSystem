@@ -1,9 +1,9 @@
-package handlers
+package handler
 
 import (
 	"net/http"
 	"webserver/internal/logger"
-	"webserver/internal/services"
+	"webserver/internal/service"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,7 +15,7 @@ var Upgrader = websocket.Upgrader{
 
 // ViewWebsocketHandler handles viewer connections over WebSocket and
 // registers them in the HubService to receive broadcast frames.
-func ViewWebsocketHandler(manager *services.Manager, logger *logger.Logger) http.HandlerFunc {
+func ViewWebsocketHandler(manager *service.Manager, logger *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		connection, err := Upgrader.Upgrade(w, r, nil)
 		if err != nil {

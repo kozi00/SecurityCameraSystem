@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"encoding/base64"
@@ -6,9 +6,9 @@ import (
 	"sync"
 	"webserver/internal/config"
 	"webserver/internal/logger"
-	"webserver/internal/services/ai"
-	"webserver/internal/services/storage"
-	"webserver/internal/services/websocket"
+	"webserver/internal/service/ai"
+	"webserver/internal/service/storage"
+	"webserver/internal/service/websocket"
 )
 
 const (

@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"strings"
 	"webserver/internal/config"
 	"webserver/internal/logger"
-	"webserver/internal/services"
+	"webserver/internal/service"
 )
 
 var (
@@ -17,7 +17,7 @@ var (
 
 // UDPCameraHandler listens for UDP packets from cameras, reconstructs JPEG frames,
 // and forwards complete frames to the Manager for processing.
-func UDPCameraHandler(manager *services.Manager, logger *logger.Logger, config *config.Config) {
+func UDPCameraHandler(manager *service.Manager, logger *logger.Logger, config *config.Config) {
 	port := strconv.Itoa(config.CamerasPort)
 
 	addr, err := net.ResolveUDPAddr("udp", ":"+port)

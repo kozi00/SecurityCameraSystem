@@ -1,4 +1,4 @@
-package models
+package model
 
 // Detection represents a detected object in an image.
 type Detection struct {

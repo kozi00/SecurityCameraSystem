@@ -2,8 +2,7 @@ package sqlite
 
 import (
 	"fmt"
-
-	"webserver/internal/models"
+	"webserver/internal/model"
 )
 
 // DetectionRepository implements repository.DetectionRepository for SQLite.
@@ -17,7 +16,7 @@ func NewDetectionRepository(db *DB) *DetectionRepository {
 }
 
 // Insert adds a new detection record to the database.
-func (r *DetectionRepository) Insert(det *models.Detection) (int64, error) {
+func (r *DetectionRepository) Insert(det *model.Detection) (int64, error) {
 	r.db.Lock()
 	defer r.db.Unlock()
 
@@ -33,7 +32,7 @@ func (r *DetectionRepository) Insert(det *models.Detection) (int64, error) {
 }
 
 // InsertBatch adds multiple detections in a single transaction.
-func (r *DetectionRepository) InsertBatch(detections []models.Detection) error {
+func (r *DetectionRepository) InsertBatch(detections []model.Detection) error {
 	r.db.Lock()
 	defer r.db.Unlock()
 
@@ -62,7 +61,7 @@ func (r *DetectionRepository) InsertBatch(detections []models.Detection) error {
 }
 
 // GetByImageID retrieves all detections for an image.
-func (r *DetectionRepository) GetByImageID(imageID int64) ([]models.Detection, error) {
+func (r *DetectionRepository) GetByImageID(imageID int64) ([]model.Detection, error) {
 	r.db.RLock()
 	defer r.db.RUnlock()
 
@@ -75,9 +74,9 @@ func (r *DetectionRepository) GetByImageID(imageID int64) ([]models.Detection, e
 	}
 	defer rows.Close()
 
-	var detections []models.Detection
+	var detections []model.Detection
 	for rows.Next() {
-		var det models.Detection
+		var det model.Detection
 		if err := rows.Scan(&det.ID, &det.ImageID, &det.ObjectName, &det.X, &det.Y, &det.Width, &det.Height, &det.Confidence); err != nil {
 			return nil, fmt.Errorf("failed to scan detection: %w", err)
 		}

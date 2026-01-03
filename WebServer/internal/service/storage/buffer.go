@@ -8,9 +8,9 @@ import (
 	"time"
 	"webserver/internal/config"
 	"webserver/internal/logger"
-	"webserver/internal/models"
+	"webserver/internal/model"
 	"webserver/internal/repository"
-	"webserver/internal/services/ai"
+	"webserver/internal/service/ai"
 )
 
 const (
@@ -120,7 +120,7 @@ func (s *BufferService) FlushImages() {
 				ts = time.Now()
 			}
 
-			dbImage := &models.Image{
+			dbImage := &model.Image{
 				Filename:  filename,
 				Camera:    image.Camera,
 				Timestamp: ts,
@@ -136,9 +136,9 @@ func (s *BufferService) FlushImages() {
 
 			// Insert detections for this image
 			if s.detectionRepo != nil && len(image.Detections) > 0 {
-				var dbDetections []models.Detection
+				var dbDetections []model.Detection
 				for _, det := range image.Detections {
-					dbDetections = append(dbDetections, models.Detection{
+					dbDetections = append(dbDetections, model.Detection{
 						ImageID:    imageID,
 						ObjectName: det.Label,
 						X:          det.X,
@@ -160,14 +160,4 @@ func (s *BufferService) FlushImages() {
 	s.logger.Info("Flushed %d images to disk", savedCount)
 	s.images = s.images[:0] // Clear buffer
 	s.bufferCount = make(map[string]int)
-}
-
-// GetImageRepository returns the image repository.
-func (s *BufferService) GetImageRepository() repository.ImageRepository {
-	return s.imageRepo
-}
-
-// GetDetectionRepository returns the detection repository.
-func (s *BufferService) GetDetectionRepository() repository.DetectionRepository {
-	return s.detectionRepo
 }

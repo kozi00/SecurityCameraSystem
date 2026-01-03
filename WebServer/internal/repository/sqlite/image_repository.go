@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"webserver/internal/models"
+	"webserver/internal/dto"
+	"webserver/internal/model"
 )
 
 // ImageRepository implements repository.ImageRepository for SQLite.
@@ -18,7 +19,7 @@ func NewImageRepository(db *DB) *ImageRepository {
 }
 
 // Insert adds a new image record to the database.
-func (r *ImageRepository) Insert(img *models.Image) (int64, error) {
+func (r *ImageRepository) Insert(img *model.Image) (int64, error) {
 	r.db.Lock()
 	defer r.db.Unlock()
 
@@ -34,11 +35,11 @@ func (r *ImageRepository) Insert(img *models.Image) (int64, error) {
 }
 
 // GetByID retrieves an image by its ID.
-func (r *ImageRepository) GetByID(id int64) (*models.Image, error) {
+func (r *ImageRepository) GetByID(id int64) (*model.Image, error) {
 	r.db.RLock()
 	defer r.db.RUnlock()
 
-	var img models.Image
+	var img model.Image
 	err := r.db.Conn().QueryRow(`
 		SELECT id, filename, camera, timestamp, filepath, filesize 
 		FROM images WHERE id = ?
@@ -54,11 +55,11 @@ func (r *ImageRepository) GetByID(id int64) (*models.Image, error) {
 }
 
 // GetByFilename retrieves an image by its filename.
-func (r *ImageRepository) GetByFilename(filename string) (*models.Image, error) {
+func (r *ImageRepository) GetByFilename(filename string) (*model.Image, error) {
 	r.db.RLock()
 	defer r.db.RUnlock()
 
-	var img models.Image
+	var img model.Image
 	err := r.db.Conn().QueryRow(`
 		SELECT id, filename, camera, timestamp, filepath, filesize 
 		FROM images WHERE filename = ?
@@ -74,7 +75,7 @@ func (r *ImageRepository) GetByFilename(filename string) (*models.Image, error) 
 }
 
 // GetAll retrieves images based on filter criteria.
-func (r *ImageRepository) GetAll(filter *models.ImageFilter) ([]models.Image, error) {
+func (r *ImageRepository) GetAll(filter *dto.PictureFilters) ([]model.Image, error) {
 	r.db.RLock()
 	defer r.db.RUnlock()
 
@@ -96,37 +97,27 @@ func (r *ImageRepository) GetAll(filter *models.ImageFilter) ([]models.Image, er
 		args = append(args, filter.Object)
 	}
 
-	if !filter.StartDate.IsZero() {
+	if !filter.DateAfter.IsZero() {
 		query += " AND DATE(i.timestamp) >= DATE(?)"
-		args = append(args, filter.StartDate)
+		args = append(args, filter.DateAfter)
 	}
 
-	if !filter.EndDate.IsZero() {
+	if !filter.DateBefore.IsZero() {
 		query += " AND DATE(i.timestamp) <= DATE(?)"
-		args = append(args, filter.EndDate)
+		args = append(args, filter.DateBefore)
 	}
 
-	if filter.TimeAfter != "" {
+	if !filter.TimeAfter.IsZero() {
 		query += " AND TIME(i.timestamp) >= TIME(?)"
-		args = append(args, filter.TimeAfter)
+		args = append(args, filter.TimeAfter.Format("15:04:05"))
 	}
 
-	if filter.TimeBefore != "" {
+	if !filter.TimeBefore.IsZero() {
 		query += " AND TIME(i.timestamp) <= TIME(?)"
-		args = append(args, filter.TimeBefore)
+		args = append(args, filter.TimeBefore.Format("15:04:05"))
 	}
 
 	query += " ORDER BY i.timestamp DESC"
-
-	if filter.Limit > 0 {
-		query += " LIMIT ?"
-		args = append(args, filter.Limit)
-	}
-
-	if filter.Offset > 0 {
-		query += " OFFSET ?"
-		args = append(args, filter.Offset)
-	}
 
 	rows, err := r.db.Conn().Query(query, args...)
 	if err != nil {
@@ -134,9 +125,9 @@ func (r *ImageRepository) GetAll(filter *models.ImageFilter) ([]models.Image, er
 	}
 	defer rows.Close()
 
-	var images []models.Image
+	var images []model.Image
 	for rows.Next() {
-		var img models.Image
+		var img model.Image
 		if err := rows.Scan(&img.ID, &img.Filename, &img.Camera, &img.Timestamp, &img.FilePath, &img.FileSize); err != nil {
 			return nil, fmt.Errorf("failed to scan image: %w", err)
 		}
@@ -146,8 +137,8 @@ func (r *ImageRepository) GetAll(filter *models.ImageFilter) ([]models.Image, er
 	return images, nil
 }
 
-// GetTotalCount returns the total count of images matching the filter.
-func (r *ImageRepository) GetTotalCount(filter *models.ImageFilter) (int, error) {
+// GetTotalCount returns the total number of images matching the filter criteria.
+func (r *ImageRepository) GetTotalCount(filter *dto.PictureFilters) (int, error) {
 	r.db.RLock()
 	defer r.db.RUnlock()
 
@@ -169,128 +160,33 @@ func (r *ImageRepository) GetTotalCount(filter *models.ImageFilter) (int, error)
 		args = append(args, filter.Object)
 	}
 
-	if !filter.StartDate.IsZero() {
+	if !filter.DateAfter.IsZero() {
 		query += " AND DATE(i.timestamp) >= DATE(?)"
-		args = append(args, filter.StartDate)
+		args = append(args, filter.DateAfter)
 	}
 
-	if !filter.EndDate.IsZero() {
+	if !filter.DateBefore.IsZero() {
 		query += " AND DATE(i.timestamp) <= DATE(?)"
-		args = append(args, filter.EndDate)
+		args = append(args, filter.DateBefore)
 	}
 
-	if filter.TimeAfter != "" {
+	if !filter.TimeAfter.IsZero() {
 		query += " AND TIME(i.timestamp) >= TIME(?)"
-		args = append(args, filter.TimeAfter)
+		args = append(args, filter.TimeAfter.Format("15:04:05"))
 	}
 
-	if filter.TimeBefore != "" {
+	if !filter.TimeBefore.IsZero() {
 		query += " AND TIME(i.timestamp) <= TIME(?)"
-		args = append(args, filter.TimeBefore)
+		args = append(args, filter.TimeBefore.Format("15:04:05"))
 	}
 
 	var count int
-	if err := r.db.Conn().QueryRow(query, args...).Scan(&count); err != nil {
+	err := r.db.Conn().QueryRow(query, args...).Scan(&count)
+	if err != nil {
 		return 0, fmt.Errorf("failed to count images: %w", err)
 	}
 
 	return count, nil
-}
-
-// Exists checks if an image with the given filename exists.
-func (r *ImageRepository) Exists(filename string) (bool, error) {
-	r.db.RLock()
-	defer r.db.RUnlock()
-
-	var count int
-	err := r.db.Conn().QueryRow(`SELECT COUNT(*) FROM images WHERE filename = ?`, filename).Scan(&count)
-	if err != nil {
-		return false, fmt.Errorf("failed to check image existence: %w", err)
-	}
-	return count > 0, nil
-}
-
-// GetCameras returns a list of unique camera names.
-func (r *ImageRepository) GetCameras() ([]string, error) {
-	r.db.RLock()
-	defer r.db.RUnlock()
-
-	rows, err := r.db.Conn().Query(`SELECT DISTINCT camera FROM images ORDER BY camera`)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query cameras: %w", err)
-	}
-	defer rows.Close()
-
-	var cameras []string
-	for rows.Next() {
-		var camera string
-		if err := rows.Scan(&camera); err != nil {
-			return nil, fmt.Errorf("failed to scan camera: %w", err)
-		}
-		cameras = append(cameras, camera)
-	}
-	return cameras, nil
-}
-
-// GetStats returns statistics about stored images.
-func (r *ImageRepository) GetStats() (*models.ImageStats, error) {
-	r.db.RLock()
-	defer r.db.RUnlock()
-
-	stats := &models.ImageStats{
-		PerCamera:    make(map[string]int),
-		ObjectCounts: make(map[string]int),
-	}
-
-	// Total images count
-	if err := r.db.Conn().QueryRow(`SELECT COUNT(*) FROM images`).Scan(&stats.TotalImages); err != nil {
-		return nil, err
-	}
-
-	// Total size
-	if err := r.db.Conn().QueryRow(`SELECT COALESCE(SUM(filesize), 0) FROM images`).Scan(&stats.TotalSizeBytes); err != nil {
-		return nil, err
-	}
-
-	// Images per camera
-	rows, err := r.db.Conn().Query(`SELECT camera, COUNT(*) FROM images GROUP BY camera`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var camera string
-		var count int
-		if err := rows.Scan(&camera, &count); err != nil {
-			return nil, err
-		}
-		stats.PerCamera[camera] = count
-	}
-
-	// Most detected objects
-	objectRows, err := r.db.Conn().Query(`
-		SELECT object_name, COUNT(*) as cnt 
-		FROM detections 
-		GROUP BY object_name 
-		ORDER BY cnt DESC 
-		LIMIT 10
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer objectRows.Close()
-
-	for objectRows.Next() {
-		var obj string
-		var count int
-		if err := objectRows.Scan(&obj, &count); err != nil {
-			return nil, err
-		}
-		stats.ObjectCounts[obj] = count
-	}
-
-	return stats, nil
 }
 
 // Delete removes an image by its ID.

@@ -9,11 +9,11 @@ import (
 	"webserver/internal/logger"
 	"webserver/internal/repository"
 	"webserver/internal/repository/sqlite"
-	"webserver/internal/routes"
-	"webserver/internal/services"
-	"webserver/internal/services/ai"
-	"webserver/internal/services/storage"
-	"webserver/internal/services/websocket"
+	"webserver/internal/route"
+	"webserver/internal/service"
+	"webserver/internal/service/ai"
+	"webserver/internal/service/storage"
+	"webserver/internal/service/websocket"
 )
 
 // App wires core components (config, logger, services) and runs the HTTP server.
@@ -23,7 +23,7 @@ type App struct {
 	detectorServices []*ai.DetectorService
 	bufferService    *storage.BufferService
 	hubService       *websocket.HubService
-	manager          *services.Manager
+	manager          *service.Manager
 	db               *sqlite.DB
 	imageRepo        repository.ImageRepository
 	detectionRepo    repository.DetectionRepository
@@ -64,7 +64,7 @@ func NewApp() *App {
 	buffer := storage.NewBufferService(cfg, logger, imageRepo, detectionRepo)
 	hub := websocket.NewHubService(cfg, logger)
 
-	mng := services.NewManager(detectors, buffer, hub, cfg, logger)
+	mng := service.NewManager(detectors, buffer, hub, cfg, logger)
 
 	return &App{
 		config:           cfg,
@@ -92,7 +92,7 @@ func (a *App) Run() error {
 	go a.hubService.Run()
 
 	// Setup routes
-	router := routes.SetupRoutes(a.manager, a.config, a.logger)
+	router := route.SetupRoutes(a.manager, a.config, a.logger, a.imageRepo, a.detectionRepo)
 
 	a.logger.Info("🚀 Security Camera Server\n")
 	a.logger.Info("📍 URL: http://localhost:%d\n", a.config.Port)
