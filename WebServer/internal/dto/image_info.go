@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// PictureInfo represents parsed metadata about a stored picture.
-type PictureInfo struct {
+// ImageInfo represents parsed metadata about a stored image.
+type ImageInfo struct {
 	Name      string    `json:"name"`
 	Date      time.Time `json:"date"`
 	TimeOfDay time.Time `json:"timeOfDay"`
@@ -14,9 +14,9 @@ type PictureInfo struct {
 	Objects   []string  `json:"objects"` // Multiple detected objects
 }
 
-// MarshalJSON customizes JSON output for PictureInfo to format date and time-of-day.
-func (p PictureInfo) MarshalJSON() ([]byte, error) {
-	type Alias PictureInfo
+// MarshalJSON customizes JSON output for ImageInfo to format date and time-of-day.
+func (p ImageInfo) MarshalJSON() ([]byte, error) {
+	type Alias ImageInfo
 	return json.Marshal(&struct {
 		Date      string `json:"date"`
 		TimeOfDay string `json:"timeOfDay"`

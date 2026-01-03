@@ -28,7 +28,7 @@ func GetPicturesFromDBHandler(manager *service.Manager, cfg *config.Config, logg
 		page := atoiDefault(q.Get("page"), 1)
 		limit := atoiDefault(q.Get("limit"), 24)
 
-		filter := &dto.PictureFilters{
+		filter := &dto.ImageFilters{
 			Camera:     q.Get("camera"),
 			Object:     q.Get("object"),
 			DateAfter:  parseDate(q.Get("dateAfter")),
@@ -56,8 +56,8 @@ func GetPicturesFromDBHandler(manager *service.Manager, cfg *config.Config, logg
 			totalSize += img.FileSize
 		}
 
-		// Convert to PictureInfo format for response
-		var pictures []dto.PictureInfo
+		// Convert to ImageInfo format for response
+		var pictures []dto.ImageInfo
 		for _, img := range images {
 			// Get object names for this image
 			var objects []string
@@ -69,7 +69,7 @@ func GetPicturesFromDBHandler(manager *service.Manager, cfg *config.Config, logg
 				}
 			}
 
-			pictures = append(pictures, dto.PictureInfo{
+			pictures = append(pictures, dto.ImageInfo{
 				Name:      img.Filename,
 				Date:      img.Timestamp,
 				TimeOfDay: img.Timestamp,
@@ -78,8 +78,8 @@ func GetPicturesFromDBHandler(manager *service.Manager, cfg *config.Config, logg
 			})
 		}
 
-		data := dto.PicturesData{
-			Pictures:    pictures,
+		data := dto.ImagesData{
+			Images:      pictures,
 			ImagesDir:   cfg.ImageDirectory,
 			Size:        totalSize,
 			MaxSize:     MaxImageDirectorySize,

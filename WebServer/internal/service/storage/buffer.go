@@ -7,31 +7,23 @@ import (
 	"sync"
 	"time"
 	"webserver/internal/config"
+	"webserver/internal/dto"
 	"webserver/internal/logger"
 	"webserver/internal/model"
 	"webserver/internal/repository"
-	"webserver/internal/service/ai"
 )
 
 const (
 	// ImageBufferLimit limits how many images per camera are buffered before flushing.
-	ImageBufferLimit = 15
+	ImageBufferLimit = 10
 	// ImageBufferFlushInterval defines how often (seconds) buffered images are flushed to disk.
 	ImageBufferFlushInterval = 30
 )
 
-// BufferedImage holds image data and detection results before flushing to disk.
-type BufferedImage struct {
-	Timestamp  string
-	Camera     string
-	Detections []ai.DetectionResult
-	Data       []byte
-}
-
 // BufferService buffers images in memory and periodically flushes them to disk.
 type BufferService struct {
 	imagesDir     string
-	images        []BufferedImage
+	images        []dto.BufferedImage
 	bufferCount   map[string]int
 	mu            sync.Mutex
 	logger        *logger.Logger
@@ -43,7 +35,7 @@ type BufferService struct {
 func NewBufferService(config *config.Config, logger *logger.Logger, imageRepo repository.ImageRepository, detectionRepo repository.DetectionRepository) *BufferService {
 	return &BufferService{
 		imagesDir:     config.ImageDirectory,
-		images:        make([]BufferedImage, 0),
+		images:        make([]dto.BufferedImage, 0),
 		bufferCount:   make(map[string]int),
 		logger:        logger,
 		imageRepo:     imageRepo,
@@ -64,12 +56,12 @@ func (s *BufferService) Run() {
 }
 
 // AddImage appends an image to the in-memory buffer for a given camera.
-func (s *BufferService) AddImage(imageData []byte, cameraId string, detections []ai.DetectionResult) {
+func (s *BufferService) AddImage(imageData []byte, cameraId string, detections []dto.DetectionResult) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	timestamp := time.Now().Format("2006-01-02_15-04_05.000")
-	image := BufferedImage{
+	image := dto.BufferedImage{
 		Timestamp:  timestamp,
 		Camera:     cameraId,
 		Detections: detections,

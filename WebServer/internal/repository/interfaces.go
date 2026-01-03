@@ -13,8 +13,8 @@ type ImageRepository interface {
 	// Read operations
 	GetByID(id int64) (*model.Image, error)
 	GetByFilename(filename string) (*model.Image, error)
-	GetAll(filter *dto.PictureFilters) ([]model.Image, error)
-	GetTotalCount(filter *dto.PictureFilters) (int, error)
+	GetAll(filter *dto.ImageFilters) ([]model.Image, error)
+	GetTotalCount(filter *dto.ImageFilters) (int, error)
 
 	// Delete operations
 	Delete(id int64) error

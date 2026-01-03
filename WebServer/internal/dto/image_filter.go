@@ -1,9 +1,9 @@
-// PictureFilters describe user-provided filters to narrow the picture list.
+// ImageFilters describe user-provided filters to narrow the image list.
 package dto
 
 import "time"
 
-type PictureFilters struct {
+type ImageFilters struct {
 	Camera     string
 	Object     string
 	DateAfter  time.Time

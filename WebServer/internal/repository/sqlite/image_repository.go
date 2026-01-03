@@ -75,7 +75,7 @@ func (r *ImageRepository) GetByFilename(filename string) (*model.Image, error) {
 }
 
 // GetAll retrieves images based on filter criteria.
-func (r *ImageRepository) GetAll(filter *dto.PictureFilters) ([]model.Image, error) {
+func (r *ImageRepository) GetAll(filter *dto.ImageFilters) ([]model.Image, error) {
 	r.db.RLock()
 	defer r.db.RUnlock()
 
@@ -138,7 +138,7 @@ func (r *ImageRepository) GetAll(filter *dto.PictureFilters) ([]model.Image, err
 }
 
 // GetTotalCount returns the total number of images matching the filter criteria.
-func (r *ImageRepository) GetTotalCount(filter *dto.PictureFilters) (int, error) {
+func (r *ImageRepository) GetTotalCount(filter *dto.ImageFilters) (int, error) {
 	r.db.RLock()
 	defer r.db.RUnlock()
 
