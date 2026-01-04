@@ -30,8 +30,8 @@ func Load() *Config {
 	return &Config{
 		Port:              getEnvAsInt("PORT", 80),
 		Password:          getEnv("PASSWORD", ""),
-		ModelPath:         getEnv("MODEL_PATH", filepath.Join(".", "internal", "services", "ai", "frozen_inference_graph.pb")),
-		ConfigPath:        getEnv("CONFIG_PATH", filepath.Join(".", "internal", "services", "ai", "ssd_mobilenet_v1_coco_2017_11_17.pbtxt")),
+		ModelPath:         getEnv("MODEL_PATH", filepath.Join(".", "internal", "service", "ai", "frozen_inference_graph.pb")),
+		ConfigPath:        getEnv("CONFIG_PATH", filepath.Join(".", "internal", "service", "ai", "ssd_mobilenet_v1_coco_2017_11_17.pbtxt")),
 		ImageDirectory:    getEnv("IMAGE_DIR", filepath.Join(".", "static", "images")),
 		LogDirectory:      getEnv("LOG_DIR", filepath.Join(".", "logs")),
 		DatabasePath:      getEnv("DATABASE_PATH", filepath.Join(".", "data", "images.db")),

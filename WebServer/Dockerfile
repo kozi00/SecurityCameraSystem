@@ -144,8 +144,8 @@ EXPOSE 81/udp
 ENV PORT=8080
 ENV PASSWORD=""
 ENV STATIC_DIR="/app/static"
-ENV MODEL_PATH="/app/internal/services/ai/frozen_inference_graph.pb"
-ENV CONFIG_PATH="/app/internal/services/ai/ssd_mobilenet_v1_coco_2017_11_17.pbtxt"
+ENV MODEL_PATH="/app/internal/service/ai/frozen_inference_graph.pb"
+ENV CONFIG_PATH="/app/internal/service/ai/ssd_mobilenet_v1_coco_2017_11_17.pbtxt"
 ENV IMAGE_DIR="/app/static/images"
 ENV LOG_DIR="/app/logs"
 ENV DATABASE_PATH="/app/data/images.db"
