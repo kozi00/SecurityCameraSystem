@@ -72,15 +72,15 @@ function displayPictures(data) {
                         onclick="openPicture('${picture.name}')"
                         onerror="this.parentElement.innerHTML='<div class=\'image-error\'>Błąd ładowania</div>'">
                 <div class="photo-overlay">
-                    <button class="btn-view" onclick="openPicture('${picture.name}')" title="Otwórz w nowej karcie">🔍</button>
-                    <button class="btn-delete" onclick="confirmDeletePicture('${picture.name}')" title="Usuń zdjęcie">🗑️</button>
+                    <button class="btn-view" onclick="openPicture('${picture.name}')" title="Otwórz w nowej karcie">Otwórz</button>
+                    <button class="btn-delete" onclick="confirmDeletePicture('${picture.name}')" title="Usuń zdjęcie">Usuń</button>
                 </div>
             </div>
             <div class="photo-info">
-                <div class="photo-info-row"><span class="label">📅 Data:</span> ${picture.date}</div>
-                <div class="photo-info-row"><span class="label">🕐 Godzina:</span> ${picture.timeOfDay}</div>
-                <div class="photo-info-row"><span class="label">📷 Kamera:</span> ${picture.camera}</div>
-                <div class="photo-info-row"><span class="label">👁️ Obiekt:</span> ${picture.objects && picture.objects.length > 0 ? picture.objects.join(", ") : "brak"}</div>
+                <div class="photo-info-row"><span class="label">Data:</span> ${picture.date}</div>
+                <div class="photo-info-row"><span class="label">Godzina:</span> ${picture.timeOfDay}</div>
+                <div class="photo-info-row"><span class="label">Kamera:</span> ${picture.camera}</div>
+                <div class="photo-info-row"><span class="label">Obiekt:</span> ${picture.objects && picture.objects.length > 0 ? picture.objects.join(", ") : "brak"}</div>
             </div>
         `;
         

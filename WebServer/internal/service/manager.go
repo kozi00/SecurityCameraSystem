@@ -140,11 +140,13 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 	}
 
 	if len(detections) > 0 {
-		imageWithDetections, err := m.detectorServices[workerID].DrawRectangle(detections, image)
-		if err != nil {
-			m.logger.Error("Failed to draw rectangles: %v", err)
-			imageWithDetections = image
-		}
+		//imageWithDetections, err := m.detectorServices[workerID].DrawRectangle(detections, image)
+		//if err != nil {
+		//	m.logger.Error("Failed to draw rectangles: %v", err)
+		//	imageWithDetections = image
+		//}
+		// Use original image temporarily until data is collected
+		imageWithDetections := image
 
 		// Limit to 5 detections max
 		if len(detections) > 5 {
