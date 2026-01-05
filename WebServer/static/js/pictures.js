@@ -54,20 +54,29 @@ async function loadPictures(page = 1) {
 
 function displayPictures(data) {
     const gallery = document.getElementById('gallery');
+    const emptyMessage = document.getElementById('empty');
+    
     gallery.innerHTML = '';
 
-    if (data.length === 0) {
-        document.getElementById('empty').style.display = 'block';
+    const pictures = data.images || [];
+
+    if (pictures.length === 0) {
+        emptyMessage.style.display = 'block';
         return;
+    } else {
+        emptyMessage.style.display = 'none';
     }
 
-    data.pictures.forEach(picture => {
+    pictures.forEach(picture => {
         const card = document.createElement('div');
         card.className = 'photo-card';
         card.dataset.filename = picture.name;
+        
+        const imagePath = `${data.imagesDir}/${picture.name}`;
+
         card.innerHTML = `
             <div class="photo-image-container">
-                <img src="${data.imagesDir}/${picture.name}" 
+                <img src="${imagePath}" 
                         alt="${picture.name}"
                         onclick="openPicture('${picture.name}')"
                         onerror="this.parentElement.innerHTML='<div class=\'image-error\'>Błąd ładowania</div>'">
@@ -80,7 +89,10 @@ function displayPictures(data) {
                 <div class="photo-info-row"><span class="label">Data:</span> ${picture.date}</div>
                 <div class="photo-info-row"><span class="label">Godzina:</span> ${picture.timeOfDay}</div>
                 <div class="photo-info-row"><span class="label">Kamera:</span> ${picture.camera}</div>
-                <div class="photo-info-row"><span class="label">Obiekt:</span> ${picture.objects && picture.objects.length > 0 ? picture.objects.join(", ") : "brak"}</div>
+                <div class="photo-info-row">
+                    <span class="label">Obiekt:</span> 
+                    ${picture.objects && picture.objects.length > 0 ? picture.objects.join(", ") : "brak"}
+                </div>
             </div>
         `;
         

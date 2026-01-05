@@ -44,16 +44,16 @@ func GetPicturesFromDBHandler(manager *service.Manager, cfg *config.Config, logg
 			return
 		}
 
+		totalSize, err := imageRepo.GetDirectorySize()
+		if err != nil {
+			logger.Error("Error getting image directory size: %v", err)
+			totalSize = 0
+		}
+
 		totalCount, err := imageRepo.GetTotalCount(filter)
 		if err != nil {
 			logger.Error("Error counting images: %v", err)
 			totalCount = len(images)
-		}
-
-		// Calculate total size
-		var totalSize int64
-		for _, img := range images {
-			totalSize += img.FileSize
 		}
 
 		// Convert to ImageInfo format for response

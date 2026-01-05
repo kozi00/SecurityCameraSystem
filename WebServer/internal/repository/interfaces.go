@@ -15,6 +15,7 @@ type ImageRepository interface {
 	GetByFilename(filename string) (*model.Image, error)
 	GetAll(filter *dto.ImageFilters) ([]model.Image, error)
 	GetTotalCount(filter *dto.ImageFilters) (int, error)
+	GetDirectorySize() (int64, error)
 
 	// Delete operations
 	Delete(id int64) error

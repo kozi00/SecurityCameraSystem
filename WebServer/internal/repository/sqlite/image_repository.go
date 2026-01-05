@@ -189,6 +189,18 @@ func (r *ImageRepository) GetTotalCount(filter *dto.ImageFilters) (int, error) {
 	return count, nil
 }
 
+func (r *ImageRepository) GetDirectorySize() (int64, error) {
+	r.db.RLock()
+	defer r.db.RUnlock()
+
+	var totalSize int64
+	err := r.db.Conn().QueryRow(`SELECT SUM(filesize) FROM images`).Scan(&totalSize)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get directory size: %w", err)
+	}
+	return totalSize, nil
+}
+
 // Delete removes an image by its ID.
 func (r *ImageRepository) Delete(id int64) error {
 	r.db.Lock()
