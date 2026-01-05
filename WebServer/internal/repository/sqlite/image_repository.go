@@ -119,6 +119,19 @@ func (r *ImageRepository) GetAll(filter *dto.ImageFilters) ([]model.Image, error
 
 	query += " ORDER BY i.timestamp DESC"
 
+	limit := filter.Limit
+	page := filter.Page
+	if limit <= 0 {
+		limit = 24
+	}
+	if page < 1 {
+		page = 1
+	}
+
+	offset := (page - 1) * limit
+	query += " LIMIT ? OFFSET ?"
+	args = append(args, limit, offset)
+
 	rows, err := r.db.Conn().Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query images: %w", err)
@@ -194,7 +207,7 @@ func (r *ImageRepository) GetDirectorySize() (int64, error) {
 	defer r.db.RUnlock()
 
 	var totalSize int64
-	err := r.db.Conn().QueryRow(`SELECT SUM(filesize) FROM images`).Scan(&totalSize)
+	err := r.db.Conn().QueryRow(`SELECT COALESCE(SUM(filesize), 0) FROM images`).Scan(&totalSize)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get directory size: %w", err)
 	}

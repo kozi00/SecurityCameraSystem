@@ -10,4 +10,6 @@ type ImageFilters struct {
 	DateBefore time.Time
 	TimeAfter  time.Time
 	TimeBefore time.Time
+	Limit      int
+	Page       int
 }

@@ -81,8 +81,8 @@ function displayPictures(data) {
                         onclick="openPicture('${picture.name}')"
                         onerror="this.parentElement.innerHTML='<div class=\'image-error\'>Błąd ładowania</div>'">
                 <div class="photo-overlay">
-                    <button class="btn-view" onclick="openPicture('${picture.name}')" title="Otwórz w nowej karcie">Otwórz</button>
-                    <button class="btn-delete" onclick="confirmDeletePicture('${picture.name}')" title="Usuń zdjęcie">Usuń</button>
+                    <button class="btn-view" onclick="openPicture('${picture.name}')" title="Otwórz w nowej karcie">🔎</button>
+                    <button class="btn-delete" onclick="confirmDeletePicture('${picture.name}')" title="Usuń zdjęcie">🗑️</button>
                 </div>
             </div>
             <div class="photo-info">
