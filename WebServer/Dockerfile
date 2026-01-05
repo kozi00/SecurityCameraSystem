@@ -133,22 +133,25 @@ COPY --from=builder /app/internal/services/ai/*.pb /app/internal/services/ai/
 COPY --from=builder /app/internal/services/ai/*.pbtxt /app/internal/services/ai/
 COPY --from=builder /app/static /app/static
 
-# Create directories for logs and images
-RUN mkdir -p /app/logs /app/static/images
+# Create directories for logs, images and database
+RUN mkdir -p /app/logs /app/static/images /app/data
 
-# Expose port (default 8080)
+# Expose ports (HTTP and UDP for cameras)
 EXPOSE 8080
+EXPOSE 81/udp
 
 # Set environment variables with defaults
 ENV PORT=8080
 ENV PASSWORD=""
 ENV STATIC_DIR="/app/static"
-ENV MODEL_PATH="/app/internal/services/ai/frozen_inference_graph.pb"
-ENV CONFIG_PATH="/app/internal/services/ai/ssd_mobilenet_v1_coco_2017_11_17.pbtxt"
+ENV MODEL_PATH="/app/internal/service/ai/frozen_inference_graph.pb"
+ENV CONFIG_PATH="/app/internal/service/ai/ssd_mobilenet_v1_coco_2017_11_17.pbtxt"
 ENV IMAGE_DIR="/app/static/images"
 ENV LOG_DIR="/app/logs"
+ENV DATABASE_PATH="/app/data/images.db"
 ENV PROCESSING_WORKERS=4
 ENV CAMERAS_PORT=81
 ENV CAMERAS="192.168.1.32:drzwi,192.168.1.29:brama"
+
 # Run the application
 CMD ["/app/server"]

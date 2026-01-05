@@ -12,13 +12,22 @@ services:
       - PASSWORD=${PASSWORD:-admin123}
       - PROCESSING_WORKERS=${PROCESSING_WORKERS:-4}
       - CAMERAS_PORT=${CAMERAS_PORT:-81}
-      - CAMERAS=${CAMERAS} 
+      - CAMERAS=${CAMERAS}
+      - DATABASE_PATH=/app/data/images.db
+      - IMAGE_DIR=/app/static/images
+      - LOG_DIR=/app/logs
     volumes:
-      - ./static:/app/static
+      # Persistent storage for static files (images)
+      - ./static/images:/app/static/images
+      # Persistent storage for logs
       - ./logs:/app/logs
+      # Persistent storage for SQLite database
+      - ./data:/app/data
     restart: unless-stopped
     networks:
       - security-camera-network
+    # Use host network mode for UDP camera communication (alternative)
+    # network_mode: host
 
 networks:
   security-camera-network:

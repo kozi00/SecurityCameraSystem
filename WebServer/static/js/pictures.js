@@ -64,16 +64,23 @@ function displayPictures(data) {
     data.pictures.forEach(picture => {
         const card = document.createElement('div');
         card.className = 'photo-card';
+        card.dataset.filename = picture.name;
         card.innerHTML = `
-            <img src="${data.imagesDir}/${picture.name}" 
-                    alt="${picture.name}"
-                    onclick="openPicture('${picture.name}')"
-                    onerror="this.style.display='none'">
+            <div class="photo-image-container">
+                <img src="${data.imagesDir}/${picture.name}" 
+                        alt="${picture.name}"
+                        onclick="openPicture('${picture.name}')"
+                        onerror="this.parentElement.innerHTML='<div class=\'image-error\'>Błąd ładowania</div>'">
+                <div class="photo-overlay">
+                    <button class="btn-view" onclick="openPicture('${picture.name}')" title="Otwórz w nowej karcie">Otwórz</button>
+                    <button class="btn-delete" onclick="confirmDeletePicture('${picture.name}')" title="Usuń zdjęcie">Usuń</button>
+                </div>
+            </div>
             <div class="photo-info">
-                <div>Data: ${picture.date}</div>
-                <div>Godzina: ${picture.timeOfDay}</div>
-                <div>Kamera: ${picture.camera}</div>
-                <div>Obiekt: ${picture.objects && picture.objects.length > 0 ? picture.objects.join(", ") : "brak"}</div>
+                <div class="photo-info-row"><span class="label">Data:</span> ${picture.date}</div>
+                <div class="photo-info-row"><span class="label">Godzina:</span> ${picture.timeOfDay}</div>
+                <div class="photo-info-row"><span class="label">Kamera:</span> ${picture.camera}</div>
+                <div class="photo-info-row"><span class="label">Obiekt:</span> ${picture.objects && picture.objects.length > 0 ? picture.objects.join(", ") : "brak"}</div>
             </div>
         `;
         
@@ -167,6 +174,79 @@ function openPicture(filename) {
     window.open(`/api/pictures/view?image=${encodeURIComponent(filename)}`, '_blank');
 }
 
+let pictureToDelete = null;
+
+function confirmDeletePicture(filename) {
+    pictureToDelete = filename;
+    const modal = document.getElementById('deleteModal');
+    const filenameEl = document.getElementById('deleteFilename');
+    if (filenameEl) filenameEl.textContent = filename;
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) modal.style.display = 'none';
+    pictureToDelete = null;
+}
+
+async function deletePicture() {
+    if (!pictureToDelete) return;
+    
+    const filename = pictureToDelete;
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+    if (deleteBtn) {
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Usuwanie...';
+    }
+    
+    try {
+        const response = await fetch(`/api/pictures/delete?filename=${encodeURIComponent(filename)}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Błąd podczas usuwania: ' + response.status);
+        }
+        
+        // Animacja usunięcia karty
+        const card = document.querySelector(`.photo-card[data-filename="${filename}"]`);
+        if (card) {
+            card.classList.add('deleting');
+            setTimeout(() => card.remove(), 300);
+        }
+        
+        showNotification('Zdjęcie zostało usunięte', 'success');
+        
+        // Odśwież listę po krótkim opóźnieniu
+        setTimeout(() => loadPictures(currentPage), 500);
+        
+    } catch (error) {
+        showNotification('Błąd: ' + error.message, 'error');
+    } finally {
+        closeDeleteModal();
+        if (deleteBtn) {
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = 'Usuń';
+        }
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">&times;</button>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('fade-out');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
 function getFiltersQuery() {
         const c = document.getElementById('filterCamera').value.trim();
         const o = document.getElementById('filterObject').value.trim();
@@ -195,10 +275,25 @@ document.getElementById('clearAllPictures').addEventListener('click', async ()=>
             try {
                 const res = await fetch('/api/pictures/clear', { method: 'POST' });
                 if (!res.ok) throw new Error('Błąd czyszczenia: ' + res.status);
+                showNotification('Wszystkie zdjęcia zostały usunięte', 'success');
                 loadPictures(1);
             } catch(e) {
-                alert(e.message);
+                showNotification('Błąd: ' + e.message, 'error');
             }
         });
+
+// Zamknij modal klikając poza nim
+document.getElementById('deleteModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'deleteModal') {
+        closeDeleteModal();
+    }
+});
+
+// Zamknij modal klawiszem Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeDeleteModal();
+    }
+});
 
 loadPictures(1);

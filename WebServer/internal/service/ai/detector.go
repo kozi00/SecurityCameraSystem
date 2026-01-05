@@ -7,6 +7,7 @@ import (
 	"os"
 	"sync"
 	"webserver/internal/config"
+	"webserver/internal/dto"
 	"webserver/internal/logger"
 
 	"gocv.io/x/gocv"
@@ -18,15 +19,6 @@ const (
 	// DetectionThreshold is the minimum confidence for object detections.
 	DetectionThreshold = 0.6
 )
-
-type DetectionResult struct {
-	Label      string
-	Confidence float64
-	X          int
-	Y          int
-	Width      int
-	Height     int
-}
 
 // CameraState holds motion detection state for a single camera.
 type CameraState struct {
@@ -153,9 +145,9 @@ func (s *DetectorService) DetectMotion(imageBytes []byte, cameraID string) (bool
 }
 
 // DetectObjects runs the DNN on the image and returns array of DetectionResults that were above the confidence threshold.
-func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, error) {
+func (s *DetectorService) DetectObjects(imageBytes []byte) ([]dto.DetectionResult, error) {
 	if s.net.Empty() {
-		return []DetectionResult{}, fmt.Errorf("detection network not initialized")
+		return []dto.DetectionResult{}, fmt.Errorf("detection network not initialized")
 	}
 
 	//Convert image to mat
@@ -177,7 +169,7 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 	output := s.net.Forward("")
 	defer output.Close()
 
-	var results []DetectionResult
+	var results []dto.DetectionResult
 
 	// Process detections with output: [ batch_id, class_id, confidence, x1, y1, x2, y2 ]
 	outputReshaped := output.Reshape(1, output.Total()/7)
@@ -190,7 +182,7 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 			width := int(outputReshaped.GetFloatAt(i, 5)*float32(mat.Cols())) - x
 			height := int(outputReshaped.GetFloatAt(i, 6)*float32(mat.Rows())) - y
 
-			results = append(results, DetectionResult{
+			results = append(results, dto.DetectionResult{
 				Label:      getClassLabel(classID),
 				Confidence: float64(confidence),
 				X:          x,
@@ -208,7 +200,7 @@ func (s *DetectorService) DetectObjects(imageBytes []byte) ([]DetectionResult, e
 }
 
 // DrawRectangle draws detection results on the image and returns a re-encoded JPEG buffer.
-func (s *DetectorService) DrawRectangle(detections []DetectionResult, img []byte) ([]byte, error) {
+func (s *DetectorService) DrawRectangle(detections []dto.DetectionResult, img []byte) ([]byte, error) {
 	red := color.RGBA{R: 255, G: 0, B: 0, A: 0}
 
 	mat, err := gocv.IMDecode(img, gocv.IMReadColor)

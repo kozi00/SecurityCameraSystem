@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"encoding/base64"
@@ -6,9 +6,9 @@ import (
 	"sync"
 	"webserver/internal/config"
 	"webserver/internal/logger"
-	"webserver/internal/services/ai"
-	"webserver/internal/services/storage"
-	"webserver/internal/services/websocket"
+	"webserver/internal/service/ai"
+	"webserver/internal/service/storage"
+	"webserver/internal/service/websocket"
 )
 
 const (
@@ -140,20 +140,19 @@ func (m *Manager) processImageAsync(image []byte, camera string, workerID int) {
 	}
 
 	if len(detections) > 0 {
-		imageWithDetections, err := m.detectorServices[workerID].DrawRectangle(detections, image)
-		if err != nil {
-			m.logger.Error("Failed to draw rectangles: %v", err)
-			imageWithDetections = image
+		//imageWithDetections, err := m.detectorServices[workerID].DrawRectangle(detections, image)
+		//if err != nil {
+		//	m.logger.Error("Failed to draw rectangles: %v", err)
+		//	imageWithDetections = image
+		//}
+		// Use original image temporarily until data is collected
+		imageWithDetections := image
+
+		// Limit to 5 detections max
+		if len(detections) > 5 {
+			detections = detections[:5]
 		}
 
-		var detectionsStr []string // Store up to 5 detected object labels
-		for i, det := range detections {
-			if i >= 5 {
-				break
-			}
-			detectionsStr = append(detectionsStr, det.Label)
-		}
-
-		m.bufferService.AddImage(imageWithDetections, camera, detectionsStr)
+		m.bufferService.AddImage(imageWithDetections, camera, detections)
 	}
 }

@@ -73,11 +73,34 @@
         
         <div id="pagination" class="pagination"></div>
         
-        <div id="loading" class="loading" style="display: none;">Ładowanie...</div>
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <span>Ładowanie zdjęć...</span>
+        </div>
         <div id="error" class="error" style="display: none;"></div>
         <div id="empty" class="empty" style="display: none;">
+            <div class="empty-icon">📷</div>
             <h3>Brak zdjęć</h3>
-            <p>Galeria jest pusta</p>
+            <p>Galeria jest pusta - zdjęcia pojawią się po wykryciu ruchu przez kamery</p>
+        </div>
+    </div>
+
+    <!-- Modal potwierdzenia usunięcia -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Potwierdź usunięcie</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Czy na pewno chcesz usunąć to zdjęcie?</p>
+                <p class="filename-display"><code id="deleteFilename"></code></p>
+                <p class="warning-text">⚠️ Ta operacja jest nieodwracalna!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">Anuluj</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="deletePicture()">Usuń</button>
+            </div>
         </div>
     </div>
 

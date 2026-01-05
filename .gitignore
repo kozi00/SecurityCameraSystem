@@ -17,3 +17,4 @@ WebServer/.vscode/
 WebServer/logs/error.log
 WebServer/logs/warning.log
 WebServer/logs/info.log
+data/
