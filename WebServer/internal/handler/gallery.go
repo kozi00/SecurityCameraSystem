@@ -35,6 +35,8 @@ func GetPicturesFromDBHandler(manager *service.Manager, cfg *config.Config, logg
 			DateBefore: parseDate(q.Get("dateBefore")),
 			TimeAfter:  parseTimeOfDay(q.Get("timeAfter")),
 			TimeBefore: parseTimeOfDay(q.Get("timeBefore")),
+			Limit:      limit,
+			Page:       page,
 		}
 
 		images, err := imageRepo.GetAll(filter)
