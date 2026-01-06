@@ -25,6 +25,7 @@ ESP32-CAM → UDP → Go Server → WebSocket → Browser
 - **Communication:** - **Ingress:** UDP (Low latency video streaming from cameras)
   - **Egress:** Gorilla WebSocket (Real-time broadcasting to clients)
 - **Computer Vision:** GoCV (OpenCV wrapper), SSD Mobilenet v1 COCO
+- **Database**: SQLite, light and fast database engine
 - **Frontend:** HTML5/CSS3, vanilla JavaScript
 - **Infrastructure:** Docker, Docker Compose
 
@@ -64,6 +65,11 @@ ESP32-CAM → UDP → Go Server → WebSocket → Browser
 2. Advanced filtering available in the UI.
 3. Logs accessible via `/logs/*` endpoints.
 
+### 7) Database
+1. Every image is also represented in SQLite relational database.
+2. When saving image, it's data is also stored in Image and Detection tables.
+3. It allows for better data analysis and management.
+
 ##  Structure 
 
 ```
@@ -74,14 +80,19 @@ WebServer/
 ├── cmd/
 │   └── server/
 │       └── main.go           # Server entry point
+├── data/                     # SQLite files 
+├── tests/                    # Integration tests
 ├── internal/
 │   ├── app/                  # Application initialization
 │   ├── config/               # Configuration
-│   ├── handlers/             # HTTP/WS handlers (gallery, login, logs, websockets)
+│   ├── handler/             # HTTP/WS handlers (gallery, login, logs, websockets)
 │   ├── logger/               # Logger for writing events to files
 │   ├── middleware/           # Authentication middleware
-│   ├── routes/               # Route registration
-│   └── services/
+│   ├── route/               # Route registration
+│   ├── model/               # Entities represented in database
+│   ├── dto/                 # Data objects used for transfering information
+│   ├── repository/          # Connecting to database and executing queries
+│   └── service/
 │       ├── ai/               # Motion detection and object recognition service, AI models
 │       ├── storage/          # Service for saving files to disk
 │       └── websocket/        # Service for handling websockets with viewers
